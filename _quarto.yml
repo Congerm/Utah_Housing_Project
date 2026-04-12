@@ -1,0 +1,27 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Utah Housing Affordability — STAT 386"
+  navbar:
+    background: primary
+    left:
+      - href: index.qmd
+        text: Home
+      - href: Documentation.qmd
+        text: Documentation
+      - href: Tutorial.qmd
+        text: Tutorial
+      - href: TechnicalReport.qmd
+        text: Technical Report
+
+jupyter: utah-housing-project
+
+format:
+  html:
+    theme: cosmo
+    toc: true
+    code-fold: false
+    code-tools: true
+    css: styles.css

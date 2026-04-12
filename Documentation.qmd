@@ -1,0 +1,106 @@
+---
+title: "Documentation"
+---
+
+## **Overview**
+
+<!-- TODO: Write a 2–3 sentence description of what the project does and what data source it uses. -->
+
+[Project and data source overview goes here.]
+
+---
+
+## **Data Source**
+
+<!-- TODO: Describe where the data comes from (e.g. U.S. Census Bureau ACS 5-year estimates).
+     Include a link to the source and any relevant details about geographic scope and time range. -->
+
+| Property | Details |
+|----------|---------|
+| **Source** | [Data source name and URL] |
+| **Coverage** | [Geographic scope, e.g. Utah census tracts] |
+| **Years** | [Year range, e.g. 2009–2023] |
+| **Unit of observation** | [e.g. Census tract × year] |
+| **Total rows** | [e.g. ~9,240] |
+
+---
+
+## **Key Variables**
+
+<!-- TODO: Fill in the variable table with actual column names from your dataset.
+     The table below mirrors the structure in the example project. -->
+
+### Outcome Variable
+
+| Variable | Description |
+|----------|-------------|
+| `[outcome_variable]` | [What it measures, e.g. median monthly owner costs with mortgage] |
+
+### Predictors
+
+| Variable | Description |
+|----------|-------------|
+| `[predictor_1]` | [Description] |
+| `[predictor_2]` | [Description] |
+| `[predictor_3]` | [Description] |
+| `[predictor_4]` | [Description] |
+| `[predictor_5]` | [Description] |
+
+---
+
+## **Python Package: `utah-housing`**
+
+<!-- TODO: Update the package name if it differs. Describe what the package provides. -->
+
+The `utah-housing` package provides functions to fetch ACS data directly from the Census API and
+compute derived housing affordability metrics.
+
+### Installation
+
+```bash
+pip install utah-housing
+```
+
+> **Note:** A free Census API key is required. Obtain one at
+> <https://api.census.gov/data/key_signup.html> and set it as an environment variable:
+>
+> ```bash
+> export CENSUS_API_KEY="your_key_here"
+> ```
+
+### Core Functions
+
+```{python}
+#| eval: false
+
+from utah_housing import fetch_all_years, OUTCOME, BASE_PREDICTORS, COMPLEX_PREDICTORS
+
+# Fetch ACS 5-year estimates for all years
+df = fetch_all_years(years=range(2009, 2024))
+
+# Inspect variable groupings
+print("Outcome:", OUTCOME)
+print("Base predictors:", BASE_PREDICTORS)
+print("Complex predictors:", COMPLEX_PREDICTORS)
+```
+
+### Function Reference
+
+<!-- TODO: Expand with all public functions in the package. -->
+
+| Function | Description |
+|----------|-------------|
+| `fetch_all_years(years)` | Fetches ACS 5-year estimates for all Utah census tracts across the given year range |
+| `OUTCOME` | String constant naming the outcome variable |
+| `BASE_PREDICTORS` | List of basic predictor variable names |
+| `COMPLEX_PREDICTORS` | List of extended predictor variable names |
+
+---
+
+## **License**
+
+<!-- TODO: Confirm and update license text. -->
+
+MIT 2025
+
+---

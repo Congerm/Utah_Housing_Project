@@ -1,0 +1,23 @@
+---
+title: "Utah Housing Affordability Project"
+---
+
+<!-- TODO: Add a banner image of Utah (e.g. a landscape or map) -->
+<!-- ![Project Banner](your_image.png) -->
+
+<!-- TODO: Write a 2–3 sentence overview of the project: what data is used, what question is being
+     answered, and who the intended audience is. -->
+
+[Brief project overview goes here.]
+
+---
+
+## What's Inside
+
+- **[Documentation](Documentation.qmd)** — Data source, variables, and the `utah-housing` Python package.
+- **[Tutorial](Tutorial.qmd)** — Step-by-step guide to fetching, cleaning, and exploring the data.
+- **[Technical Report](TechnicalReport.qmd)** — EDA, modeling, and findings.
+
+---
+
+<!-- TODO: Add a short "Key Findings" or "Highlights" section once analysis is complete. -->

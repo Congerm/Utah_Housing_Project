@@ -1,0 +1,198 @@
+[
+  {
+    "objectID": "Tutorial.html",
+    "href": "Tutorial.html",
+    "title": "Tutorial: Accessing and Exploring the Data",
+    "section": "",
+    "text": "[Tutorial intro goes here — e.g. “This tutorial walks through fetching, cleaning, and doing initial exploration of the Utah housing affordability dataset.”]"
+  },
+  {
+    "objectID": "Tutorial.html#installation",
+    "href": "Tutorial.html#installation",
+    "title": "Tutorial: Accessing and Exploring the Data",
+    "section": "Installation",
+    "text": "Installation\nInstall the utah-housing package and set your Census API key before running any code cells.\npip install utah-housing\nSet your Census API key (obtain a free key at https://api.census.gov/data/key_signup.html):\n\nimport os\nos.environ[\"CENSUS_API_KEY\"] = \"your_census_api_key_here\""
+  },
+  {
+    "objectID": "Tutorial.html#reading-in-the-data",
+    "href": "Tutorial.html#reading-in-the-data",
+    "title": "Tutorial: Accessing and Exploring the Data",
+    "section": "Reading in the Data",
+    "text": "Reading in the Data\n\nimport pandas as pd\nfrom utah_housing import fetch_all_years, OUTCOME, BASE_PREDICTORS, COMPLEX_PREDICTORS\n\n# Fetch ACS 5-year estimates for Utah census tracts, 2009–2023\ndf = fetch_all_years(years=range(2009, 2024))\ndf.head()\n\n\n# Save to CSV so you can reload without hitting the API again\ndf.to_csv(\"data/utah_housing.csv\", index=False)\n\n\n# Reload from CSV (faster than re-fetching)\ndf = pd.read_csv(\"data/utah_housing.csv\")\ndf.head()"
+  },
+  {
+    "objectID": "Tutorial.html#initial-exploration",
+    "href": "Tutorial.html#initial-exploration",
+    "title": "Tutorial: Accessing and Exploring the Data",
+    "section": "Initial Exploration",
+    "text": "Initial Exploration\n\nprint(\"Shape:\", df.shape)\nprint(\"\\nOutcome variable:\", OUTCOME)\nprint(\"Base predictors:\", BASE_PREDICTORS)\nprint(\"Complex predictors:\", COMPLEX_PREDICTORS)\n\n\n# Check for missing values in key columns\nanalysis_cols = [\"year\", \"GEOID\"] + [OUTCOME] + COMPLEX_PREDICTORS\ndf[analysis_cols].isnull().sum()"
+  },
+  {
+    "objectID": "Tutorial.html#cleaning-the-data",
+    "href": "Tutorial.html#cleaning-the-data",
+    "title": "Tutorial: Accessing and Exploring the Data",
+    "section": "Cleaning the Data",
+    "text": "Cleaning the Data\n\n\n# Drop rows missing the outcome variable\ndf_clean = df.dropna(subset=[OUTCOME]).copy()\n\n# Extract county name from the NAME field for easier filtering\ndf_clean[\"county_name\"] = df_clean[\"NAME\"].str.extract(r\",\\s*(.+?)\\s+County\", expand=False)\n\nprint(f\"Rows after cleaning: {len(df_clean):,}\")\ndf_clean.head()"
+  },
+  {
+    "objectID": "Tutorial.html#subsetting-by-county-or-year",
+    "href": "Tutorial.html#subsetting-by-county-or-year",
+    "title": "Tutorial: Accessing and Exploring the Data",
+    "section": "Subsetting by County or Year",
+    "text": "Subsetting by County or Year\n\n# Filter to a specific county\nsalt_lake = df_clean[df_clean[\"county_name\"] == \"Salt Lake\"]\nprint(salt_lake.shape)\n\n# Filter to a specific year\ndf_2023 = df_clean[df_clean[\"year\"] == 2023]\nprint(df_2023.shape)"
+  },
+  {
+    "objectID": "Tutorial.html#basic-summary-statistics",
+    "href": "Tutorial.html#basic-summary-statistics",
+    "title": "Tutorial: Accessing and Exploring the Data",
+    "section": "Basic Summary Statistics",
+    "text": "Basic Summary Statistics\n\nsummary_cols = [OUTCOME] + COMPLEX_PREDICTORS\ndf_clean[summary_cols].describe().round(2)\n\n\n\nThe data is now ready for EDA and modeling (see the Technical Report)."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Utah Housing Affordability Project",
+    "section": "",
+    "text": "[Brief project overview goes here.]"
+  },
+  {
+    "objectID": "index.html#whats-inside",
+    "href": "index.html#whats-inside",
+    "title": "Utah Housing Affordability Project",
+    "section": "What’s Inside",
+    "text": "What’s Inside\n\nDocumentation — Data source, variables, and the utah-housing Python package.\nTutorial — Step-by-step guide to fetching, cleaning, and exploring the data.\nTechnical Report — EDA, modeling, and findings."
+  },
+  {
+    "objectID": "data_acquisition.html",
+    "href": "data_acquisition.html",
+    "title": "Utah Housing Data Acquisition",
+    "section": "",
+    "text": "ACS 5-year estimates for Utah census tracts, 2009–2023.\nRun this notebook once to fetch the data and save it to data/utah_housing.csv. After that, the CSV can be reloaded directly without hitting the Census API again."
+  },
+  {
+    "objectID": "data_acquisition.html#setup",
+    "href": "data_acquisition.html#setup",
+    "title": "Utah Housing Data Acquisition",
+    "section": "1. Setup",
+    "text": "1. Setup\n\nimport os\nimport pandas as pd\nfrom utah_housing import fetch_all_years, OUTCOME, BASE_PREDICTORS, COMPLEX_PREDICTORS"
+  },
+  {
+    "objectID": "data_acquisition.html#census-api-key",
+    "href": "data_acquisition.html#census-api-key",
+    "title": "Utah Housing Data Acquisition",
+    "section": "2. Census API Key",
+    "text": "2. Census API Key\nObtain a free key at: https://api.census.gov/data/key_signup.html\nSet it below, or store it in a .env file and load with python-dotenv.\n\n# TODO: Replace with your Census API key (do NOT commit this to git)\nos.environ[\"CENSUS_API_KEY\"] = \"your_census_api_key_here\""
+  },
+  {
+    "objectID": "data_acquisition.html#data-acquisition",
+    "href": "data_acquisition.html#data-acquisition",
+    "title": "Utah Housing Data Acquisition",
+    "section": "3. Data Acquisition",
+    "text": "3. Data Acquisition\nFetch ACS 5-year estimates for all Utah census tracts across 2009–2023.\n\ndf = fetch_all_years(years=range(2009, 2024))\nprint(f\"Total rows: {len(df):,}\")\ndf.head()"
+  },
+  {
+    "objectID": "data_acquisition.html#save-data",
+    "href": "data_acquisition.html#save-data",
+    "title": "Utah Housing Data Acquisition",
+    "section": "4. Save Data",
+    "text": "4. Save Data\n\nos.makedirs(\"data\", exist_ok=True)\ndf.to_csv(\"data/utah_housing.csv\", index=False)\nprint(\"Saved to data/utah_housing.csv\")"
+  },
+  {
+    "objectID": "data_acquisition.html#initial-exploration",
+    "href": "data_acquisition.html#initial-exploration",
+    "title": "Utah Housing Data Acquisition",
+    "section": "5. Initial Exploration",
+    "text": "5. Initial Exploration\n\ndf.head()\n\n\nprint(\"Shape:\", df.shape)\nprint(\"\\nOutcome variable:\", OUTCOME)\nprint(\"Base predictors:\", BASE_PREDICTORS)\nprint(\"Complex predictors:\", COMPLEX_PREDICTORS)\n\n\ndf.dtypes\n\n\ndf.describe()\n\n\n# Check missing values in key analysis columns\nanalysis_cols = [\"year\", \"GEOID\"] + [OUTCOME] + COMPLEX_PREDICTORS\ndf[analysis_cols].isnull().sum()"
+  },
+  {
+    "objectID": "Documentation.html",
+    "href": "Documentation.html",
+    "title": "Documentation",
+    "section": "",
+    "text": "[Project and data source overview goes here.]"
+  },
+  {
+    "objectID": "Documentation.html#overview",
+    "href": "Documentation.html#overview",
+    "title": "Documentation",
+    "section": "",
+    "text": "[Project and data source overview goes here.]"
+  },
+  {
+    "objectID": "Documentation.html#data-source",
+    "href": "Documentation.html#data-source",
+    "title": "Documentation",
+    "section": "Data Source",
+    "text": "Data Source\n\n\n\n\nProperty\nDetails\n\n\n\n\nSource\n[Data source name and URL]\n\n\nCoverage\n[Geographic scope, e.g. Utah census tracts]\n\n\nYears\n[Year range, e.g. 2009–2023]\n\n\nUnit of observation\n[e.g. Census tract × year]\n\n\nTotal rows\n[e.g. ~9,240]"
+  },
+  {
+    "objectID": "Documentation.html#key-variables",
+    "href": "Documentation.html#key-variables",
+    "title": "Documentation",
+    "section": "Key Variables",
+    "text": "Key Variables\n\n\nOutcome Variable\n\n\n\n\n\n\n\nVariable\nDescription\n\n\n\n\n[outcome_variable]\n[What it measures, e.g. median monthly owner costs with mortgage]\n\n\n\n\n\nPredictors\n\n\n\nVariable\nDescription\n\n\n\n\n[predictor_1]\n[Description]\n\n\n[predictor_2]\n[Description]\n\n\n[predictor_3]\n[Description]\n\n\n[predictor_4]\n[Description]\n\n\n[predictor_5]\n[Description]"
+  },
+  {
+    "objectID": "Documentation.html#python-package-utah-housing",
+    "href": "Documentation.html#python-package-utah-housing",
+    "title": "Documentation",
+    "section": "Python Package: utah-housing",
+    "text": "Python Package: utah-housing\n\nThe utah-housing package provides functions to fetch ACS data directly from the Census API and compute derived housing affordability metrics.\n\nInstallation\npip install utah-housing\n\nNote: A free Census API key is required. Obtain one at https://api.census.gov/data/key_signup.html and set it as an environment variable:\nexport CENSUS_API_KEY=\"your_key_here\"\n\n\n\nCore Functions\n\nfrom utah_housing import fetch_all_years, OUTCOME, BASE_PREDICTORS, COMPLEX_PREDICTORS\n\n# Fetch ACS 5-year estimates for all years\ndf = fetch_all_years(years=range(2009, 2024))\n\n# Inspect variable groupings\nprint(\"Outcome:\", OUTCOME)\nprint(\"Base predictors:\", BASE_PREDICTORS)\nprint(\"Complex predictors:\", COMPLEX_PREDICTORS)\n\n\n\nFunction Reference\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nfetch_all_years(years)\nFetches ACS 5-year estimates for all Utah census tracts across the given year range\n\n\nOUTCOME\nString constant naming the outcome variable\n\n\nBASE_PREDICTORS\nList of basic predictor variable names\n\n\nCOMPLEX_PREDICTORS\nList of extended predictor variable names"
+  },
+  {
+    "objectID": "Documentation.html#license",
+    "href": "Documentation.html#license",
+    "title": "Documentation",
+    "section": "License",
+    "text": "License\n\nMIT 2025"
+  },
+  {
+    "objectID": "TechnicalReport.html",
+    "href": "TechnicalReport.html",
+    "title": "Technical Report",
+    "section": "",
+    "text": "[Introduction goes here.]"
+  },
+  {
+    "objectID": "TechnicalReport.html#introduction",
+    "href": "TechnicalReport.html#introduction",
+    "title": "Technical Report",
+    "section": "",
+    "text": "[Introduction goes here.]"
+  },
+  {
+    "objectID": "TechnicalReport.html#data-source-and-methodology",
+    "href": "TechnicalReport.html#data-source-and-methodology",
+    "title": "Technical Report",
+    "section": "Data Source and Methodology",
+    "text": "Data Source and Methodology\n\n\nData acquisition\n\n[Describe how data was collected, e.g. ACS 5-year estimates via the Census API using the utah-housing package.]\n\nCleaning pipeline\n\n[Describe cleaning steps: missing-value handling, column derivation, filtering, etc.]\n\nAnalysis workflow\n\nEDA: [Describe exploratory plots and summaries.]\nModel selection: [Describe the approach, e.g. best-subsets by AIC and LASSO.]\nModel assessment: [Describe evaluation method, e.g. 5-fold cross-validated PMSE.]\n\nTooling and reproducibility\n\nPrimary libraries: pandas, numpy, matplotlib, seaborn, statsmodels, patsy, scikit-learn\nEnvironment and packaging: see pyproject.toml"
+  },
+  {
+    "objectID": "TechnicalReport.html#eda",
+    "href": "TechnicalReport.html#eda",
+    "title": "Technical Report",
+    "section": "EDA",
+    "text": "EDA\n\n# TODO: Replace variable names with your actual predictors.\n# The 2x2 layout below mirrors the example project structure.\n\nfig, axes = plt.subplots(2, 2, figsize=(12, 10))\nfig.suptitle(\"EDA: Outcome vs Selected Predictors\", fontsize=16, fontweight=\"bold\")\n\n# Plot 1 (top-left): Scatterplot — outcome vs predictor 1\n# axes[0, 0].scatter(df[\"[predictor_1]\"], df[OUTCOME], alpha=0.5, s=20, color=\"steelblue\")\n# axes[0, 0].set_xlabel(\"[Predictor 1 label]\")\n# axes[0, 0].set_ylabel(OUTCOME.replace(\"_\", \" \").title())\n# axes[0, 0].set_title(\"Outcome vs [Predictor 1]\", fontweight=\"bold\")\n# axes[0, 0].grid(True, alpha=0.3)\n\n# Plot 2 (top-right): Scatterplot — outcome vs predictor 2\n# axes[0, 1].scatter(df[\"[predictor_2]\"], df[OUTCOME], alpha=0.5, s=20, color=\"coral\")\n# axes[0, 1].set_xlabel(\"[Predictor 2 label]\")\n# axes[0, 1].set_ylabel(OUTCOME.replace(\"_\", \" \").title())\n# axes[0, 1].set_title(\"Outcome vs [Predictor 2]\", fontweight=\"bold\")\n# axes[0, 1].grid(True, alpha=0.3)\n\n# Plot 3 (bottom-left): Scatterplot — outcome vs predictor 3\n# axes[1, 0].scatter(df[\"[predictor_3]\"], df[OUTCOME], alpha=0.5, s=20)\n# axes[1, 0].set_xlabel(\"[Predictor 3 label]\")\n# axes[1, 0].set_ylabel(OUTCOME.replace(\"_\", \" \").title())\n# axes[1, 0].set_title(\"Outcome vs [Predictor 3]\", fontweight=\"bold\")\n# axes[1, 0].grid(True, alpha=0.3)\n\n# Plot 4 (bottom-right): Boxplot — outcome by a categorical variable (e.g. county)\n# counties_of_interest = [\"[county_1]\", \"[county_2]\", \"[county_3]\"]\n# sub_df = df[df[\"county_name\"].isin(counties_of_interest)]\n# sub_df.boxplot(column=OUTCOME, by=\"county_name\", ax=axes[1, 1])\n# axes[1, 1].set_xlabel(\"County\")\n# axes[1, 1].set_ylabel(OUTCOME.replace(\"_\", \" \").title())\n# axes[1, 1].set_title(\"Outcome by County\", fontweight=\"bold\")\n# axes[1, 1].get_figure().suptitle(\"\")\n\nplt.tight_layout()\nplt.show()\n\n\n# TODO: Add trend-over-time plot (statewide median of outcome by year).\n\n# yearly = (\n#     df.groupby(\"year\")[OUTCOME]\n#     .median()\n#     .reset_index()\n# )\n# fig2, ax = plt.subplots(figsize=(10, 4))\n# ax.plot(yearly[\"year\"], yearly[OUTCOME], marker=\"o\")\n# ax.set_xlabel(\"Year\")\n# ax.set_ylabel(OUTCOME.replace(\"_\", \" \").title())\n# ax.set_title(f\"Statewide Median {OUTCOME.replace('_', ' ').title()} Over Time\")\n# ax.grid(alpha=0.3)\n# plt.show()"
+  },
+  {
+    "objectID": "TechnicalReport.html#link-to-streamlit-app",
+    "href": "TechnicalReport.html#link-to-streamlit-app",
+    "title": "Technical Report",
+    "section": "Link to Streamlit App",
+    "text": "Link to Streamlit App\n\nLink to Streamlit app"
+  },
+  {
+    "objectID": "TechnicalReport.html#analysis",
+    "href": "TechnicalReport.html#analysis",
+    "title": "Technical Report",
+    "section": "Analysis",
+    "text": "Analysis\n\nimport itertools\nimport statsmodels.formula.api as smf\nfrom patsy import dmatrices\nfrom sklearn.model_selection import KFold\nfrom sklearn.linear_model import LinearRegression, LassoCV, Lasso\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.pipeline import Pipeline\nfrom sklearn.metrics import mean_squared_error\n\n# TODO: Update cat_vars to reflect categorical columns in your dataset (e.g. county, year).\n# cat_vars = [\"county_name\"]\n# for c in cat_vars:\n#     if c in df.columns:\n#         df[c] = df[c].astype(\"category\")\n\n# TODO: Update candidates to the columns you want to consider as predictors.\n# candidates = COMPLEX_PREDICTORS\n\n# ----------------------------\n# Best subsets selection via AIC\n# ----------------------------\n# best_aic = np.inf\n# best_formula = None\n# best_model = None\n#\n# for k in range(1, len(candidates) + 1):\n#     for subset in itertools.combinations(candidates, k):\n#         terms = [f\"C({v})\" if v in cat_vars else v for v in subset]\n#         formula = f\"{OUTCOME} ~ \" + \" + \".join(terms)\n#         try:\n#             model = smf.ols(formula, data=df).fit()\n#             if model.aic &lt; best_aic:\n#                 best_aic = model.aic\n#                 best_formula = formula\n#                 best_model = model\n#         except Exception:\n#             continue\n#\n# print(\"Best AIC:\", best_aic)\n# print(\"Best formula:\", best_formula)\n# print(best_model.summary())\n\n# ----------------------------\n# CV PMSE for best-AIC model\n# ----------------------------\n# y_aic, X_aic = dmatrices(best_formula, data=df, return_type=\"dataframe\")\n# y_aic = np.ravel(y_aic)\n# kf = KFold(n_splits=5, shuffle=True, random_state=1)\n# mses_aic = []\n# for tr, te in kf.split(X_aic):\n#     lr = LinearRegression(fit_intercept=False)\n#     lr.fit(X_aic.iloc[tr], y_aic[tr])\n#     preds = lr.predict(X_aic.iloc[te])\n#     mses_aic.append(mean_squared_error(y_aic[te], preds))\n# pmse_aic = np.mean(mses_aic)\n\n# ----------------------------\n# LASSO (lambda = 1-SE rule)\n# ----------------------------\n# full_formula = f\"{OUTCOME} ~ \" + \" + \".join(\n#     [f\"C({v})\" if v in cat_vars else v for v in candidates]\n# )\n# y_lasso, X_lasso = dmatrices(full_formula, data=df, return_type=\"dataframe\")\n# y_lasso = np.ravel(y_lasso)\n#\n# lasso_cv = Pipeline([\n#     (\"scaler\", StandardScaler()),\n#     (\"lasso\", LassoCV(cv=5, random_state=1))\n# ])\n# lasso_cv.fit(X_lasso, y_lasso)\n#\n# mse_path = lasso_cv.named_steps[\"lasso\"].mse_path_.mean(axis=1)\n# mse_std  = lasso_cv.named_steps[\"lasso\"].mse_path_.std(axis=1)\n# idx_min  = np.argmin(mse_path)\n# mse_1se  = mse_path[idx_min] + mse_std[idx_min]\n# idx_1se  = np.where(mse_path &lt;= mse_1se)[0][-1]\n# alpha_1se = lasso_cv.named_steps[\"lasso\"].alphas_[idx_1se]\n#\n# lasso_1se = Pipeline([\n#     (\"scaler\", StandardScaler()),\n#     (\"lasso\", Lasso(alpha=alpha_1se))\n# ])\n# lasso_1se.fit(X_lasso, y_lasso)\n#\n# coef = lasso_1se.named_steps[\"lasso\"].coef_\n# selected = X_lasso.columns[coef != 0]\n# print(\"LASSO selected variables:\", list(selected))\n\n# ----------------------------\n# Refit OLS on LASSO-selected variables\n# ----------------------------\n# selected_vars = set()\n# for col in selected:\n#     if col.startswith(\"C(\"):\n#         var = col.split(\"[\")[0].replace(\"C(\", \"\").replace(\")\", \"\")\n#         selected_vars.add(f\"C({var})\")\n#     else:\n#         selected_vars.add(col)\n# selected_vars = sorted(selected_vars)\n# lasso_formula = f\"{OUTCOME} ~ \" + \" + \".join(selected_vars)\n# lasso_refit = smf.ols(lasso_formula, data=df).fit()\n# print(lasso_refit.summary())\n\n# ----------------------------\n# CV PMSE for LASSO-selected model\n# ----------------------------\n# y_lasso2, X_lasso2 = dmatrices(lasso_formula, data=df, return_type=\"dataframe\")\n# y_lasso2 = np.ravel(y_lasso2)\n# mses_lasso = []\n# for tr, te in kf.split(X_lasso2):\n#     lr = LinearRegression(fit_intercept=False)\n#     lr.fit(X_lasso2.iloc[tr], y_lasso2[tr])\n#     preds = lr.predict(X_lasso2.iloc[te])\n#     mses_lasso.append(mean_squared_error(y_lasso2[te], preds))\n# pmse_lasso = np.mean(mses_lasso)\n#\n# print(f\"Best Subsets (AIC) PMSE : {pmse_aic:.3f}\")\n# print(f\"LASSO (1SE) PMSE        : {pmse_lasso:.3f}\")"
+  },
+  {
+    "objectID": "TechnicalReport.html#conclusion",
+    "href": "TechnicalReport.html#conclusion",
+    "title": "Technical Report",
+    "section": "Conclusion",
+    "text": "Conclusion\n\n[Conclusion goes here.]"
+  }
+]
