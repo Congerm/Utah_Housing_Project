@@ -60,7 +60,7 @@
     "href": "index.html#whats-inside",
     "title": "Utah Housing Affordability Project",
     "section": "What’s Inside",
-    "text": "What’s Inside\n\nDocumentation — Data source, variables, and the utah-housing Python package.\nTutorial — Step-by-step guide to fetching, cleaning, and exploring the data.\nTechnical Report — EDA, modeling, and findings."
+    "text": "What’s Inside\n\nDocumentation — Data source, variables, and the utah-housing Python package.\nTutorial — Step-by-step guide to fetching, cleaning, and exploring the data.\nTechnical Report — EDA, modeling, and findings.\nInteractive App — Explore the data live with the Streamlit app."
   },
   {
     "objectID": "data_acquisition.html",

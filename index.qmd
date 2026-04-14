@@ -17,6 +17,7 @@ title: "Utah Housing Affordability Project"
 - **[Documentation](Documentation.qmd)** — Data source, variables, and the `utah-housing` Python package.
 - **[Tutorial](Tutorial.qmd)** — Step-by-step guide to fetching, cleaning, and exploring the data.
 - **[Technical Report](TechnicalReport.qmd)** — EDA, modeling, and findings.
+- **[Interactive App](https://stat386utahhousingproject.streamlit.app/)** — Explore the data live with the Streamlit app.
 
 ---
 

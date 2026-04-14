@@ -49,6 +49,10 @@ Open and run `data_acquisition.ipynb`. You will need a free Census API key:
 
 ### 3. Run the Streamlit app
 
+Live app: <https://stat386utahhousingproject.streamlit.app/>
+
+Or run locally:
+
 ```bash
 streamlit run app.py
 ```
