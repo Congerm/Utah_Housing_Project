@@ -4,7 +4,7 @@
     "href": "Tutorial.html",
     "title": "Tutorial: Accessing and Exploring the Data",
     "section": "",
-    "text": "[Tutorial intro goes here — e.g. “This tutorial walks through fetching, cleaning, and doing initial exploration of the Utah housing affordability dataset.”]"
+    "text": "This tutorial walks through fetching, cleaning, and doing initial exploration of the Utah housing affordability dataset."
   },
   {
     "objectID": "Tutorial.html#installation",
@@ -28,11 +28,11 @@
     "text": "Initial Exploration\n\nprint(\"Shape:\", df.shape)\nprint(\"\\nOutcome variable:\", OUTCOME)\nprint(\"Base predictors:\", BASE_PREDICTORS)\nprint(\"Complex predictors:\", COMPLEX_PREDICTORS)\n\n\n# Check for missing values in key columns\nanalysis_cols = [\"year\", \"GEOID\"] + [OUTCOME] + COMPLEX_PREDICTORS\ndf[analysis_cols].isnull().sum()"
   },
   {
-    "objectID": "Tutorial.html#cleaning-the-data",
-    "href": "Tutorial.html#cleaning-the-data",
+    "objectID": "Tutorial.html#cleaning-the-data-not-necessary-for-analysis-with-package",
+    "href": "Tutorial.html#cleaning-the-data-not-necessary-for-analysis-with-package",
     "title": "Tutorial: Accessing and Exploring the Data",
-    "section": "Cleaning the Data",
-    "text": "Cleaning the Data\n\n\n# Drop rows missing the outcome variable\ndf_clean = df.dropna(subset=[OUTCOME]).copy()\n\n# Extract county name from the NAME field for easier filtering\ndf_clean[\"county_name\"] = df_clean[\"NAME\"].str.extract(r\",\\s*(.+?)\\s+County\", expand=False)\n\nprint(f\"Rows after cleaning: {len(df_clean):,}\")\ndf_clean.head()"
+    "section": "Cleaning the Data (not necessary for analysis with package)",
+    "text": "Cleaning the Data (not necessary for analysis with package)\n\n# Drop rows missing the outcome variable\ndf_clean = df.dropna(subset=[OUTCOME]).copy()\n\n# Extract county name from the NAME field for easier filtering\ndf_clean[\"county_name\"] = df_clean[\"NAME\"].str.extract(r\",\\s*(.+?)\\s+County\", expand=False)\n\nprint(f\"Rows after cleaning: {len(df_clean):,}\")\ndf_clean.head()"
   },
   {
     "objectID": "Tutorial.html#subsetting-by-county-or-year",
@@ -46,21 +46,14 @@
     "href": "Tutorial.html#basic-summary-statistics",
     "title": "Tutorial: Accessing and Exploring the Data",
     "section": "Basic Summary Statistics",
-    "text": "Basic Summary Statistics\n\nsummary_cols = [OUTCOME] + COMPLEX_PREDICTORS\ndf_clean[summary_cols].describe().round(2)\n\n\n\nThe data is now ready for EDA and modeling (see the Technical Report)."
+    "text": "Basic Summary Statistics\n\nsummary_cols = [OUTCOME] + COMPLEX_PREDICTORS\ndf_clean[summary_cols].describe().round(2)\n\n\nThe data is now ready for EDA and modeling (see the Technical Report)."
   },
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Utah Housing Affordability Project",
+    "title": "Utah Housing Affordability Analysis - STAT 386",
     "section": "",
-    "text": "[Brief project overview goes here.]"
-  },
-  {
-    "objectID": "index.html#whats-inside",
-    "href": "index.html#whats-inside",
-    "title": "Utah Housing Affordability Project",
-    "section": "What’s Inside",
-    "text": "What’s Inside\n\nDocumentation — Data source, variables, and the utah-housing Python package.\nTutorial — Step-by-step guide to fetching, cleaning, and exploring the data.\nTechnical Report — EDA, modeling, and findings.\nInteractive App — Explore the data live with the Streamlit app."
+    "text": "This is a project website by Sujin Leek and Matthew Conger recording our work with US Census Data regarding Utah housing. We were curious as to what specific factors were affecting the decrease in affordability and availability of single-family homes in Utah.\nA streamlit app for seeing exploratory data analysis and plots can be found here.\nA link to the Github Repository for the Python package used to complete this analysis here.\nThis website includes a technical report, documentation, and a tutorial. Navigate using the tabs above."
   },
   {
     "objectID": "data_acquisition.html",
@@ -151,48 +144,55 @@
     "href": "TechnicalReport.html",
     "title": "Technical Report",
     "section": "",
-    "text": "[Introduction goes here.]"
+    "text": "A prominent topic over the past decade has been the continued rise in prices of single-family homes in America. Prices of housing contribute to wealth inequality and perpetuate barriers to family formation and upward mobility, which negatively affect many crises that the United States of America currently faces. Our hope with this project was to gain some empirical insight into why housing has become less accessible for young Americans in recent years. Using a fixed-panel regression model, we were able to isolate household income and owner-renter income gap as the two strongest predictors of rising ownership costs."
+  },
+  {
+    "objectID": "TechnicalReport.html#abstract",
+    "href": "TechnicalReport.html#abstract",
+    "title": "Technical Report",
+    "section": "",
+    "text": "A prominent topic over the past decade has been the continued rise in prices of single-family homes in America. Prices of housing contribute to wealth inequality and perpetuate barriers to family formation and upward mobility, which negatively affect many crises that the United States of America currently faces. Our hope with this project was to gain some empirical insight into why housing has become less accessible for young Americans in recent years. Using a fixed-panel regression model, we were able to isolate household income and owner-renter income gap as the two strongest predictors of rising ownership costs."
   },
   {
     "objectID": "TechnicalReport.html#introduction",
     "href": "TechnicalReport.html#introduction",
     "title": "Technical Report",
-    "section": "",
-    "text": "[Introduction goes here.]"
+    "section": "Introduction",
+    "text": "Introduction\nOver the past decade, a prominent social and economic issue has been the lack of accessibility to housing. The notion of the American Dream suggests that all citizens should be afforded the privilege of owning a house provided they work hard and manage money accordingly, but in recent years, this dream has become less realistic for many Americans.\nWhile it would have been ideal to look into single-family home purchase accessibility for the entirety of the United States of America, given the constraints we were working with, we decided to focus on data from Utah, found through the US Census."
   },
   {
-    "objectID": "TechnicalReport.html#data-source-and-methodology",
-    "href": "TechnicalReport.html#data-source-and-methodology",
+    "objectID": "TechnicalReport.html#data-acquisition-and-wrangling",
+    "href": "TechnicalReport.html#data-acquisition-and-wrangling",
     "title": "Technical Report",
-    "section": "Data Source and Methodology",
-    "text": "Data Source and Methodology\n\n\nData acquisition\n\n[Describe how data was collected, e.g. ACS 5-year estimates via the Census API using the utah-housing package.]\n\nCleaning pipeline\n\n[Describe cleaning steps: missing-value handling, column derivation, filtering, etc.]\n\nAnalysis workflow\n\nEDA: [Describe exploratory plots and summaries.]\nModel selection: [Describe the approach, e.g. best-subsets by AIC and LASSO.]\nModel assessment: [Describe evaluation method, e.g. 5-fold cross-validated PMSE.]\n\nTooling and reproducibility\n\nPrimary libraries: pandas, numpy, matplotlib, seaborn, statsmodels, patsy, scikit-learn\nEnvironment and packaging: see pyproject.toml"
+    "section": "Data Acquisition and Wrangling",
+    "text": "Data Acquisition and Wrangling\nData was obtained through the US Census Bureau’s American Community Survey (2013-2023). We constructed a dataset spanning 772 census tracts across Utah."
   },
   {
-    "objectID": "TechnicalReport.html#eda",
-    "href": "TechnicalReport.html#eda",
+    "objectID": "TechnicalReport.html#model-selection-and-validation",
+    "href": "TechnicalReport.html#model-selection-and-validation",
     "title": "Technical Report",
-    "section": "EDA",
-    "text": "EDA\n\n# TODO: Replace variable names with your actual predictors.\n# The 2x2 layout below mirrors the example project structure.\n\nfig, axes = plt.subplots(2, 2, figsize=(12, 10))\nfig.suptitle(\"EDA: Outcome vs Selected Predictors\", fontsize=16, fontweight=\"bold\")\n\n# Plot 1 (top-left): Scatterplot — outcome vs predictor 1\n# axes[0, 0].scatter(df[\"[predictor_1]\"], df[OUTCOME], alpha=0.5, s=20, color=\"steelblue\")\n# axes[0, 0].set_xlabel(\"[Predictor 1 label]\")\n# axes[0, 0].set_ylabel(OUTCOME.replace(\"_\", \" \").title())\n# axes[0, 0].set_title(\"Outcome vs [Predictor 1]\", fontweight=\"bold\")\n# axes[0, 0].grid(True, alpha=0.3)\n\n# Plot 2 (top-right): Scatterplot — outcome vs predictor 2\n# axes[0, 1].scatter(df[\"[predictor_2]\"], df[OUTCOME], alpha=0.5, s=20, color=\"coral\")\n# axes[0, 1].set_xlabel(\"[Predictor 2 label]\")\n# axes[0, 1].set_ylabel(OUTCOME.replace(\"_\", \" \").title())\n# axes[0, 1].set_title(\"Outcome vs [Predictor 2]\", fontweight=\"bold\")\n# axes[0, 1].grid(True, alpha=0.3)\n\n# Plot 3 (bottom-left): Scatterplot — outcome vs predictor 3\n# axes[1, 0].scatter(df[\"[predictor_3]\"], df[OUTCOME], alpha=0.5, s=20)\n# axes[1, 0].set_xlabel(\"[Predictor 3 label]\")\n# axes[1, 0].set_ylabel(OUTCOME.replace(\"_\", \" \").title())\n# axes[1, 0].set_title(\"Outcome vs [Predictor 3]\", fontweight=\"bold\")\n# axes[1, 0].grid(True, alpha=0.3)\n\n# Plot 4 (bottom-right): Boxplot — outcome by a categorical variable (e.g. county)\n# counties_of_interest = [\"[county_1]\", \"[county_2]\", \"[county_3]\"]\n# sub_df = df[df[\"county_name\"].isin(counties_of_interest)]\n# sub_df.boxplot(column=OUTCOME, by=\"county_name\", ax=axes[1, 1])\n# axes[1, 1].set_xlabel(\"County\")\n# axes[1, 1].set_ylabel(OUTCOME.replace(\"_\", \" \").title())\n# axes[1, 1].set_title(\"Outcome by County\", fontweight=\"bold\")\n# axes[1, 1].get_figure().suptitle(\"\")\n\nplt.tight_layout()\nplt.show()\n\n\n# TODO: Add trend-over-time plot (statewide median of outcome by year).\n\n# yearly = (\n#     df.groupby(\"year\")[OUTCOME]\n#     .median()\n#     .reset_index()\n# )\n# fig2, ax = plt.subplots(figsize=(10, 4))\n# ax.plot(yearly[\"year\"], yearly[OUTCOME], marker=\"o\")\n# ax.set_xlabel(\"Year\")\n# ax.set_ylabel(OUTCOME.replace(\"_\", \" \").title())\n# ax.set_title(f\"Statewide Median {OUTCOME.replace('_', ' ').title()} Over Time\")\n# ax.grid(alpha=0.3)\n# plt.show()"
+    "section": "Model Selection and Validation",
+    "text": "Model Selection and Validation\nWe built a two-way fixed effects (or fixed panel) regression model to identify within-tract drivers of ownership costs. We initially wanted to use a simple multiple linear regression model, but found that we were explaining almost none of the variance in our data. A fixed effects model helps to remedy the inevitable unknown elements of variance in such an economic model, as it holds certain elements constant to account for inherent variance.\nOur model controls for tract-level fixed effects, meaning time-invariant characteristics of a neighborhood like location and county \\(\\times\\) year fixed effects, which account for unknown variables like employer expansion and COVID-era impacts.\nThe model is as follows:\n\\[\ny_{it} = \\beta X_{it} + \\alpha_i + \\lambda_{c(i), t} + u_{i,t}\n\\]\nwhere \\(i =\\) tract (Census GEOID), \\(t =\\) year, and \\(c(i) =\\) county of tract \\(i\\).\n\\(\\alpha_i\\) stands for tract fixed effect, which controls for anything constant within a tract over time, like location desirability, zoning baseline, and neighborhood quality. In other words, \\(\\alpha\\) lets us compare a tract to itself over time.\n\\(\\lambda_{c(i), t}\\) stands for the county \\(\\times\\) year fixed effect, controlling for anything affecting a county in a specific year; things like local economic shocks (ex: big employer entering or leaving), policy changes, or impacts from COVID. In other words, \\(\\lambda_{c(i), t}\\) allows us to remove shared shocks across nearby areas at the same time."
   },
   {
-    "objectID": "TechnicalReport.html#link-to-streamlit-app",
-    "href": "TechnicalReport.html#link-to-streamlit-app",
+    "objectID": "TechnicalReport.html#model-building",
+    "href": "TechnicalReport.html#model-building",
     "title": "Technical Report",
-    "section": "Link to Streamlit App",
-    "text": "Link to Streamlit App\n\nLink to Streamlit app"
+    "section": "Model Building",
+    "text": "Model Building"
   },
   {
-    "objectID": "TechnicalReport.html#analysis",
-    "href": "TechnicalReport.html#analysis",
+    "objectID": "TechnicalReport.html#analyses-results-and-interpretation",
+    "href": "TechnicalReport.html#analyses-results-and-interpretation",
     "title": "Technical Report",
-    "section": "Analysis",
-    "text": "Analysis\n\nimport itertools\nimport statsmodels.formula.api as smf\nfrom patsy import dmatrices\nfrom sklearn.model_selection import KFold\nfrom sklearn.linear_model import LinearRegression, LassoCV, Lasso\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.pipeline import Pipeline\nfrom sklearn.metrics import mean_squared_error\n\n# TODO: Update cat_vars to reflect categorical columns in your dataset (e.g. county, year).\n# cat_vars = [\"county_name\"]\n# for c in cat_vars:\n#     if c in df.columns:\n#         df[c] = df[c].astype(\"category\")\n\n# TODO: Update candidates to the columns you want to consider as predictors.\n# candidates = COMPLEX_PREDICTORS\n\n# ----------------------------\n# Best subsets selection via AIC\n# ----------------------------\n# best_aic = np.inf\n# best_formula = None\n# best_model = None\n#\n# for k in range(1, len(candidates) + 1):\n#     for subset in itertools.combinations(candidates, k):\n#         terms = [f\"C({v})\" if v in cat_vars else v for v in subset]\n#         formula = f\"{OUTCOME} ~ \" + \" + \".join(terms)\n#         try:\n#             model = smf.ols(formula, data=df).fit()\n#             if model.aic &lt; best_aic:\n#                 best_aic = model.aic\n#                 best_formula = formula\n#                 best_model = model\n#         except Exception:\n#             continue\n#\n# print(\"Best AIC:\", best_aic)\n# print(\"Best formula:\", best_formula)\n# print(best_model.summary())\n\n# ----------------------------\n# CV PMSE for best-AIC model\n# ----------------------------\n# y_aic, X_aic = dmatrices(best_formula, data=df, return_type=\"dataframe\")\n# y_aic = np.ravel(y_aic)\n# kf = KFold(n_splits=5, shuffle=True, random_state=1)\n# mses_aic = []\n# for tr, te in kf.split(X_aic):\n#     lr = LinearRegression(fit_intercept=False)\n#     lr.fit(X_aic.iloc[tr], y_aic[tr])\n#     preds = lr.predict(X_aic.iloc[te])\n#     mses_aic.append(mean_squared_error(y_aic[te], preds))\n# pmse_aic = np.mean(mses_aic)\n\n# ----------------------------\n# LASSO (lambda = 1-SE rule)\n# ----------------------------\n# full_formula = f\"{OUTCOME} ~ \" + \" + \".join(\n#     [f\"C({v})\" if v in cat_vars else v for v in candidates]\n# )\n# y_lasso, X_lasso = dmatrices(full_formula, data=df, return_type=\"dataframe\")\n# y_lasso = np.ravel(y_lasso)\n#\n# lasso_cv = Pipeline([\n#     (\"scaler\", StandardScaler()),\n#     (\"lasso\", LassoCV(cv=5, random_state=1))\n# ])\n# lasso_cv.fit(X_lasso, y_lasso)\n#\n# mse_path = lasso_cv.named_steps[\"lasso\"].mse_path_.mean(axis=1)\n# mse_std  = lasso_cv.named_steps[\"lasso\"].mse_path_.std(axis=1)\n# idx_min  = np.argmin(mse_path)\n# mse_1se  = mse_path[idx_min] + mse_std[idx_min]\n# idx_1se  = np.where(mse_path &lt;= mse_1se)[0][-1]\n# alpha_1se = lasso_cv.named_steps[\"lasso\"].alphas_[idx_1se]\n#\n# lasso_1se = Pipeline([\n#     (\"scaler\", StandardScaler()),\n#     (\"lasso\", Lasso(alpha=alpha_1se))\n# ])\n# lasso_1se.fit(X_lasso, y_lasso)\n#\n# coef = lasso_1se.named_steps[\"lasso\"].coef_\n# selected = X_lasso.columns[coef != 0]\n# print(\"LASSO selected variables:\", list(selected))\n\n# ----------------------------\n# Refit OLS on LASSO-selected variables\n# ----------------------------\n# selected_vars = set()\n# for col in selected:\n#     if col.startswith(\"C(\"):\n#         var = col.split(\"[\")[0].replace(\"C(\", \"\").replace(\")\", \"\")\n#         selected_vars.add(f\"C({var})\")\n#     else:\n#         selected_vars.add(col)\n# selected_vars = sorted(selected_vars)\n# lasso_formula = f\"{OUTCOME} ~ \" + \" + \".join(selected_vars)\n# lasso_refit = smf.ols(lasso_formula, data=df).fit()\n# print(lasso_refit.summary())\n\n# ----------------------------\n# CV PMSE for LASSO-selected model\n# ----------------------------\n# y_lasso2, X_lasso2 = dmatrices(lasso_formula, data=df, return_type=\"dataframe\")\n# y_lasso2 = np.ravel(y_lasso2)\n# mses_lasso = []\n# for tr, te in kf.split(X_lasso2):\n#     lr = LinearRegression(fit_intercept=False)\n#     lr.fit(X_lasso2.iloc[tr], y_lasso2[tr])\n#     preds = lr.predict(X_lasso2.iloc[te])\n#     mses_lasso.append(mean_squared_error(y_lasso2[te], preds))\n# pmse_lasso = np.mean(mses_lasso)\n#\n# print(f\"Best Subsets (AIC) PMSE : {pmse_aic:.3f}\")\n# print(f\"LASSO (1SE) PMSE        : {pmse_lasso:.3f}\")"
+    "section": "Analyses, Results, and Interpretation",
+    "text": "Analyses, Results, and Interpretation\nA table depicting the results of the fixed panel model is below.\n\nFixed Effects Model (Tract FE + County×Year FE)\n\n\n\n\n\n\n\n\n\n\n\n\nVariable\nCoef\nStd. Err.\nt-stat\np-value\nCI Low\nCI High\n\n\n\n\npct_sf_renter_occupied\n-103.558\n64.051\n-1.617\n0.106\n-229.097\n21.981\n\n\nmedian_household_income\n0.0018\n0.0004\n4.851\n0.000\n0.0011\n0.0026\n\n\nowner_renter_income_gap\n0.0006\n0.0002\n3.925\n0.000\n0.0003\n0.0009\n\n\npct_vacant\n31.207\n72.176\n0.432\n0.666\n-110.258\n172.673\n\n\npop_in_occupied_total\n0.0088\n0.0046\n1.934\n0.053\n-0.0001\n0.0178\n\n\n\nObservations: 8,284\nAbsorbed R²: 0.9455\nThe complexity of this model leads to a lot of things to consider. For example, while “Absorbed \\(R^2\\)” is impressively high, the county \\(\\times\\) year fixed effect will by nature increase the \\(R^2\\) metric. So, we need to use other, more subjective metrics to judge the validity of our model. We found after fitting two different models (the first being a one-way fixed effects model) that main variables were more stable in our current model.\nIn particular, the coefficients on median household income and the owner-renter income gap remained consistent in both magnitude and statistical significance, suggesting that these relationships are not driven by broader county-level shocks. Overall, this stability across model specifications provides evidence that our results are not sensitive to unobserved, time-varying county-level factors, and supports the use of the more complex model as a credible framework for identifying within-tract drivers of housing costs."
   },
   {
-    "objectID": "TechnicalReport.html#conclusion",
-    "href": "TechnicalReport.html#conclusion",
+    "objectID": "TechnicalReport.html#conclusions",
+    "href": "TechnicalReport.html#conclusions",
     "title": "Technical Report",
-    "section": "Conclusion",
-    "text": "Conclusion\n\n[Conclusion goes here.]"
+    "section": "Conclusions",
+    "text": "Conclusions\nWe were successfully able to establish that significant contributors to the rise in house prices in Utah are median household income, the owner-renter income gap, and population growth.\nWhile there are still many questions we would like to explore, like “how do zoning laws affect house prices?” and “is it really less profitable to build less expensive homes?”, we consider this project a success."
   }
 ]

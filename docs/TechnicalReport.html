@@ -104,6 +104,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -157,12 +186,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
-  <li><a href="#data-source-and-methodology" id="toc-data-source-and-methodology" class="nav-link" data-scroll-target="#data-source-and-methodology">Data Source and Methodology</a></li>
-  <li><a href="#eda" id="toc-eda" class="nav-link" data-scroll-target="#eda">EDA</a></li>
-  <li><a href="#link-to-streamlit-app" id="toc-link-to-streamlit-app" class="nav-link" data-scroll-target="#link-to-streamlit-app">Link to Streamlit App</a></li>
-  <li><a href="#analysis" id="toc-analysis" class="nav-link" data-scroll-target="#analysis">Analysis</a></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract">Abstract</a></li>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#data-acquisition-and-wrangling" id="toc-data-acquisition-and-wrangling" class="nav-link" data-scroll-target="#data-acquisition-and-wrangling">Data Acquisition and Wrangling</a></li>
+  <li><a href="#model-selection-and-validation" id="toc-model-selection-and-validation" class="nav-link" data-scroll-target="#model-selection-and-validation">Model Selection and Validation</a></li>
+  <li><a href="#model-building" id="toc-model-building" class="nav-link" data-scroll-target="#model-building">Model Building</a></li>
+  <li><a href="#analyses-results-and-interpretation" id="toc-analyses-results-and-interpretation" class="nav-link" data-scroll-target="#analyses-results-and-interpretation">Analyses, Results, and Interpretation</a>
+  <ul class="collapse">
+  <li><a href="#fixed-effects-model-tract-fe-countyyear-fe" id="toc-fixed-effects-model-tract-fe-countyyear-fe" class="nav-link" data-scroll-target="#fixed-effects-model-tract-fe-countyyear-fe">Fixed Effects Model (Tract FE + County×Year FE)</a></li>
+  </ul></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">Conclusions</a></li>
   </ul>
 </nav>
     </div>
@@ -188,240 +221,118 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
+<section id="abstract" class="level2">
+<h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
+<p>A prominent topic over the past decade has been the continued rise in prices of single-family homes in America. Prices of housing contribute to wealth inequality and perpetuate barriers to family formation and upward mobility, which negatively affect many crises that the United States of America currently faces. Our hope with this project was to gain some empirical insight into why housing has become less accessible for young Americans in recent years. Using a fixed-panel regression model, we were able to isolate household income and owner-renter income gap as the two strongest predictors of rising ownership costs.</p>
+</section>
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<!-- TODO: Write 3–5 sentences covering:
-     (1) the research question / motivation,
-     (2) the outcome variable and geographic/temporal scope,
-     (3) the high-level modeling goals (EDA, model selection, evaluation). -->
-<p>[Introduction goes here.]</p>
-<hr>
+<p>Over the past decade, a prominent social and economic issue has been the lack of accessibility to housing. The notion of the American Dream suggests that all citizens should be afforded the privilege of owning a house provided they work hard and manage money accordingly, but in recent years, this dream has become less realistic for many Americans.</p>
+<p>While it would have been ideal to look into single-family home purchase accessibility for the entirety of the United States of America, given the constraints we were working with, we decided to focus on data from Utah, found through the US Census.</p>
 </section>
-<section id="data-source-and-methodology" class="level2">
-<h2 class="anchored" data-anchor-id="data-source-and-methodology">Data Source and Methodology</h2>
-<!-- TODO: Replace each numbered item with specifics for your project. -->
-<ol type="1">
-<li><strong>Data acquisition</strong>
-<ul>
-<li>[Describe how data was collected, e.g.&nbsp;ACS 5-year estimates via the Census API using the <code>utah-housing</code> package.]</li>
-</ul></li>
-<li><strong>Cleaning pipeline</strong>
-<ul>
-<li>[Describe cleaning steps: missing-value handling, column derivation, filtering, etc.]</li>
-</ul></li>
-<li><strong>Analysis workflow</strong>
-<ul>
-<li><em>EDA:</em> [Describe exploratory plots and summaries.]</li>
-<li><em>Model selection:</em> [Describe the approach, e.g.&nbsp;best-subsets by AIC and LASSO.]</li>
-<li><em>Model assessment:</em> [Describe evaluation method, e.g.&nbsp;5-fold cross-validated PMSE.]</li>
-</ul></li>
-<li><strong>Tooling and reproducibility</strong>
-<ul>
-<li>Primary libraries: <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>seaborn</code>, <code>statsmodels</code>, <code>patsy</code>, <code>scikit-learn</code></li>
-<li>Environment and packaging: see <code>pyproject.toml</code></li>
-</ul></li>
-</ol>
-<hr>
+<section id="data-acquisition-and-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="data-acquisition-and-wrangling">Data Acquisition and Wrangling</h2>
+<p>Data was obtained through the US Census Bureau’s American Community Survey (2013-2023). We constructed a dataset spanning 772 census tracts across Utah.</p>
 </section>
-<section id="eda" class="level2">
-<h2 class="anchored" data-anchor-id="eda">EDA</h2>
-<div id="0f7d5ed6" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Replace variable names with your actual predictors.</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># The 2x2 layout below mirrors the example project structure.</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">10</span>))</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"EDA: Outcome vs Selected Predictors"</span>, fontsize<span class="op">=</span><span class="dv">16</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 1 (top-left): Scatterplot — outcome vs predictor 1</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 0].scatter(df["[predictor_1]"], df[OUTCOME], alpha=0.5, s=20, color="steelblue")</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 0].set_xlabel("[Predictor 1 label]")</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 0].set_ylabel(OUTCOME.replace("_", " ").title())</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 0].set_title("Outcome vs [Predictor 1]", fontweight="bold")</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 0].grid(True, alpha=0.3)</span></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 2 (top-right): Scatterplot — outcome vs predictor 2</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 1].scatter(df["[predictor_2]"], df[OUTCOME], alpha=0.5, s=20, color="coral")</span></span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 1].set_xlabel("[Predictor 2 label]")</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 1].set_ylabel(OUTCOME.replace("_", " ").title())</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 1].set_title("Outcome vs [Predictor 2]", fontweight="bold")</span></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 1].grid(True, alpha=0.3)</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 3 (bottom-left): Scatterplot — outcome vs predictor 3</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 0].scatter(df["[predictor_3]"], df[OUTCOME], alpha=0.5, s=20)</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 0].set_xlabel("[Predictor 3 label]")</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 0].set_ylabel(OUTCOME.replace("_", " ").title())</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 0].set_title("Outcome vs [Predictor 3]", fontweight="bold")</span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 0].grid(True, alpha=0.3)</span></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 4 (bottom-right): Boxplot — outcome by a categorical variable (e.g. county)</span></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># counties_of_interest = ["[county_1]", "[county_2]", "[county_3]"]</span></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># sub_df = df[df["county_name"].isin(counties_of_interest)]</span></span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># sub_df.boxplot(column=OUTCOME, by="county_name", ax=axes[1, 1])</span></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 1].set_xlabel("County")</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 1].set_ylabel(OUTCOME.replace("_", " ").title())</span></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 1].set_title("Outcome by County", fontweight="bold")</span></span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 1].get_figure().suptitle("")</span></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div id="4c9d3d55" class="cell" data-execution_count="3">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Add trend-over-time plot (statewide median of outcome by year).</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># yearly = (</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#     df.groupby("year")[OUTCOME]</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#     .median()</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     .reset_index()</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># fig2, ax = plt.subplots(figsize=(10, 4))</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.plot(yearly["year"], yearly[OUTCOME], marker="o")</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_xlabel("Year")</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_ylabel(OUTCOME.replace("_", " ").title())</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_title(f"Statewide Median {OUTCOME.replace('_', ' ').title()} Over Time")</span></span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.grid(alpha=0.3)</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<hr>
+<section id="model-selection-and-validation" class="level2">
+<h2 class="anchored" data-anchor-id="model-selection-and-validation">Model Selection and Validation</h2>
+<p>We built a two-way fixed effects (or fixed panel) regression model to identify within-tract drivers of ownership costs. We initially wanted to use a simple multiple linear regression model, but found that we were explaining almost none of the variance in our data. A fixed effects model helps to remedy the inevitable unknown elements of variance in such an economic model, as it holds certain elements constant to account for inherent variance.</p>
+<p>Our model controls for tract-level fixed effects, meaning time-invariant characteristics of a neighborhood like location and county <span class="math inline">\(\times\)</span> year fixed effects, which account for unknown variables like employer expansion and COVID-era impacts.</p>
+<p>The model is as follows:</p>
+<p><span class="math display">\[
+y_{it} = \beta X_{it} + \alpha_i + \lambda_{c(i), t} + u_{i,t}
+\]</span></p>
+<p>where <span class="math inline">\(i =\)</span> tract (Census GEOID), <span class="math inline">\(t =\)</span> year, and <span class="math inline">\(c(i) =\)</span> county of tract <span class="math inline">\(i\)</span>.</p>
+<p><span class="math inline">\(\alpha_i\)</span> stands for tract fixed effect, which controls for anything constant within a tract over time, like location desirability, zoning baseline, and neighborhood quality. In other words, <span class="math inline">\(\alpha\)</span> lets us compare a tract to itself over time.</p>
+<p><span class="math inline">\(\lambda_{c(i), t}\)</span> stands for the county <span class="math inline">\(\times\)</span> year fixed effect, controlling for anything affecting a county in a specific year; things like local economic shocks (ex: big employer entering or leaving), policy changes, or impacts from COVID. In other words, <span class="math inline">\(\lambda_{c(i), t}\)</span> allows us to remove shared shocks across nearby areas at the same time.</p>
 </section>
-<section id="link-to-streamlit-app" class="level2">
-<h2 class="anchored" data-anchor-id="link-to-streamlit-app">Link to Streamlit App</h2>
-<!-- TODO: Replace the URL once your Streamlit app is deployed. -->
-<p><a href="https://your-app-url.streamlit.app/">Link to Streamlit app</a></p>
-<hr>
+<section id="model-building" class="level2">
+<h2 class="anchored" data-anchor-id="model-building">Model Building</h2>
 </section>
-<section id="analysis" class="level2">
-<h2 class="anchored" data-anchor-id="analysis">Analysis</h2>
-<div id="005496d3" class="cell" data-message="false" data-execution_count="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> itertools</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> patsy <span class="im">import</span> dmatrices</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> KFold</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression, LassoCV, Lasso</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> Pipeline</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Update cat_vars to reflect categorical columns in your dataset (e.g. county, year).</span></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># cat_vars = ["county_name"]</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># for c in cat_vars:</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#     if c in df.columns:</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">#         df[c] = df[c].astype("category")</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Update candidates to the columns you want to consider as predictors.</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># candidates = COMPLEX_PREDICTORS</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Best subsets selection via AIC</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co"># best_aic = np.inf</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># best_formula = None</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co"># best_model = None</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co"># for k in range(1, len(candidates) + 1):</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co">#     for subset in itertools.combinations(candidates, k):</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co">#         terms = [f"C({v})" if v in cat_vars else v for v in subset]</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co">#         formula = f"{OUTCOME} ~ " + " + ".join(terms)</span></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co">#         try:</span></span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="co">#             model = smf.ols(formula, data=df).fit()</span></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="co">#             if model.aic &lt; best_aic:</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co">#                 best_aic = model.aic</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co">#                 best_formula = formula</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co">#                 best_model = model</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co">#         except Exception:</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="co">#             continue</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="co"># print("Best AIC:", best_aic)</span></span>
-<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="co"># print("Best formula:", best_formula)</span></span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="co"># print(best_model.summary())</span></span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="co"># CV PMSE for best-AIC model</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="co"># y_aic, X_aic = dmatrices(best_formula, data=df, return_type="dataframe")</span></span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="co"># y_aic = np.ravel(y_aic)</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="co"># kf = KFold(n_splits=5, shuffle=True, random_state=1)</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="co"># mses_aic = []</span></span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="co"># for tr, te in kf.split(X_aic):</span></span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="co">#     lr = LinearRegression(fit_intercept=False)</span></span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a><span class="co">#     lr.fit(X_aic.iloc[tr], y_aic[tr])</span></span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="co">#     preds = lr.predict(X_aic.iloc[te])</span></span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="co">#     mses_aic.append(mean_squared_error(y_aic[te], preds))</span></span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="co"># pmse_aic = np.mean(mses_aic)</span></span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="co"># LASSO (lambda = 1-SE rule)</span></span>
-<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a><span class="co"># full_formula = f"{OUTCOME} ~ " + " + ".join(</span></span>
-<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a><span class="co">#     [f"C({v})" if v in cat_vars else v for v in candidates]</span></span>
-<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="co"># y_lasso, X_lasso = dmatrices(full_formula, data=df, return_type="dataframe")</span></span>
-<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="co"># y_lasso = np.ravel(y_lasso)</span></span>
-<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_cv = Pipeline([</span></span>
-<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a><span class="co">#     ("scaler", StandardScaler()),</span></span>
-<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="co">#     ("lasso", LassoCV(cv=5, random_state=1))</span></span>
-<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="co"># ])</span></span>
-<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_cv.fit(X_lasso, y_lasso)</span></span>
-<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="co"># mse_path = lasso_cv.named_steps["lasso"].mse_path_.mean(axis=1)</span></span>
-<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="co"># mse_std  = lasso_cv.named_steps["lasso"].mse_path_.std(axis=1)</span></span>
-<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a><span class="co"># idx_min  = np.argmin(mse_path)</span></span>
-<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="co"># mse_1se  = mse_path[idx_min] + mse_std[idx_min]</span></span>
-<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a><span class="co"># idx_1se  = np.where(mse_path &lt;= mse_1se)[0][-1]</span></span>
-<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a><span class="co"># alpha_1se = lasso_cv.named_steps["lasso"].alphas_[idx_1se]</span></span>
-<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_1se = Pipeline([</span></span>
-<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a><span class="co">#     ("scaler", StandardScaler()),</span></span>
-<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="co">#     ("lasso", Lasso(alpha=alpha_1se))</span></span>
-<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="co"># ])</span></span>
-<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_1se.fit(X_lasso, y_lasso)</span></span>
-<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="co"># coef = lasso_1se.named_steps["lasso"].coef_</span></span>
-<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a><span class="co"># selected = X_lasso.columns[coef != 0]</span></span>
-<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a><span class="co"># print("LASSO selected variables:", list(selected))</span></span>
-<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="co"># Refit OLS on LASSO-selected variables</span></span>
-<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="co"># selected_vars = set()</span></span>
-<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a><span class="co"># for col in selected:</span></span>
-<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a><span class="co">#     if col.startswith("C("):</span></span>
-<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a><span class="co">#         var = col.split("[")[0].replace("C(", "").replace(")", "")</span></span>
-<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a><span class="co">#         selected_vars.add(f"C({var})")</span></span>
-<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a><span class="co">#     else:</span></span>
-<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a><span class="co">#         selected_vars.add(col)</span></span>
-<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a><span class="co"># selected_vars = sorted(selected_vars)</span></span>
-<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_formula = f"{OUTCOME} ~ " + " + ".join(selected_vars)</span></span>
-<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_refit = smf.ols(lasso_formula, data=df).fit()</span></span>
-<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a><span class="co"># print(lasso_refit.summary())</span></span>
-<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a><span class="co"># CV PMSE for LASSO-selected model</span></span>
-<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a><span class="co"># y_lasso2, X_lasso2 = dmatrices(lasso_formula, data=df, return_type="dataframe")</span></span>
-<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a><span class="co"># y_lasso2 = np.ravel(y_lasso2)</span></span>
-<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a><span class="co"># mses_lasso = []</span></span>
-<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a><span class="co"># for tr, te in kf.split(X_lasso2):</span></span>
-<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a><span class="co">#     lr = LinearRegression(fit_intercept=False)</span></span>
-<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a><span class="co">#     lr.fit(X_lasso2.iloc[tr], y_lasso2[tr])</span></span>
-<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a><span class="co">#     preds = lr.predict(X_lasso2.iloc[te])</span></span>
-<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a><span class="co">#     mses_lasso.append(mean_squared_error(y_lasso2[te], preds))</span></span>
-<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a><span class="co"># pmse_lasso = np.mean(mses_lasso)</span></span>
-<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"Best Subsets (AIC) PMSE : {pmse_aic:.3f}")</span></span>
-<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"LASSO (1SE) PMSE        : {pmse_lasso:.3f}")</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<hr>
+<section id="analyses-results-and-interpretation" class="level2">
+<h2 class="anchored" data-anchor-id="analyses-results-and-interpretation">Analyses, Results, and Interpretation</h2>
+<p>A table depicting the results of the fixed panel model is below.</p>
+<section id="fixed-effects-model-tract-fe-countyyear-fe" class="level3">
+<h3 class="anchored" data-anchor-id="fixed-effects-model-tract-fe-countyyear-fe">Fixed Effects Model (Tract FE + County×Year FE)</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 34%">
+<col style="width: 11%">
+<col style="width: 12%">
+<col style="width: 9%">
+<col style="width: 10%">
+<col style="width: 11%">
+<col style="width: 11%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Coef</th>
+<th>Std. Err.</th>
+<th>t-stat</th>
+<th>p-value</th>
+<th>CI Low</th>
+<th>CI High</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>pct_sf_renter_occupied</td>
+<td>-103.558</td>
+<td>64.051</td>
+<td>-1.617</td>
+<td>0.106</td>
+<td>-229.097</td>
+<td>21.981</td>
+</tr>
+<tr class="even">
+<td>median_household_income</td>
+<td>0.0018</td>
+<td>0.0004</td>
+<td>4.851</td>
+<td>0.000</td>
+<td>0.0011</td>
+<td>0.0026</td>
+</tr>
+<tr class="odd">
+<td>owner_renter_income_gap</td>
+<td>0.0006</td>
+<td>0.0002</td>
+<td>3.925</td>
+<td>0.000</td>
+<td>0.0003</td>
+<td>0.0009</td>
+</tr>
+<tr class="even">
+<td>pct_vacant</td>
+<td>31.207</td>
+<td>72.176</td>
+<td>0.432</td>
+<td>0.666</td>
+<td>-110.258</td>
+<td>172.673</td>
+</tr>
+<tr class="odd">
+<td>pop_in_occupied_total</td>
+<td>0.0088</td>
+<td>0.0046</td>
+<td>1.934</td>
+<td>0.053</td>
+<td>-0.0001</td>
+<td>0.0178</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Observations:</strong> 8,284<br>
+<strong>Absorbed R²:</strong> 0.9455</p>
+<p>The complexity of this model leads to a lot of things to consider. For example, while “Absorbed <span class="math inline">\(R^2\)</span>” is impressively high, the county <span class="math inline">\(\times\)</span> year fixed effect will by nature increase the <span class="math inline">\(R^2\)</span> metric. So, we need to use other, more subjective metrics to judge the validity of our model. We found after fitting two different models (the first being a one-way fixed effects model) that main variables were more stable in our current model.</p>
+<p>In particular, the coefficients on median household income and the owner-renter income gap remained consistent in both magnitude and statistical significance, suggesting that these relationships are not driven by broader county-level shocks. Overall, this stability across model specifications provides evidence that our results are not sensitive to unobserved, time-varying county-level factors, and supports the use of the more complex model as a credible framework for identifying within-tract drivers of housing costs.</p>
 </section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<!-- TODO: Write 3–5 paragraphs covering:
-     (1) summary of model comparison results (AIC best-subsets vs LASSO),
-     (2) key predictors and their direction/magnitude,
-     (3) cross-validation PMSE comparison and what it implies,
-     (4) limitations (data quality, potential bias, model assumptions),
-     (5) future work (additional variables, nonlinear models, spatial effects, deployment). -->
-<p>[Conclusion goes here.]</p>
+</section>
+<section id="conclusions" class="level2">
+<h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
+<p>We were successfully able to establish that significant contributors to the rise in house prices in Utah are median household income, the owner-renter income gap, and population growth.</p>
+<p>While there are still many questions we would like to explore, like “how do zoning laws affect house prices?” and “is it really less profitable to build less expensive homes?”, we consider this project a success.</p>
 
 
 <!-- -->
@@ -880,269 +791,76 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     }
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Technical Report"</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="an">jupyter:</span><span class="co"> utah-housing-project</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">## Introduction</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- </span><span class="al">TODO</span><span class="co">: Write 3–5 sentences covering:</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">     (1) the research question / motivation,</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">     (2) the outcome variable and geographic/temporal scope,</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">     (3) the high-level modeling goals (EDA, model selection, evaluation). --&gt;</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Introduction goes here.</span><span class="co">]</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data Source and Methodology</span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- </span><span class="al">TODO</span><span class="co">: Replace each numbered item with specifics for your project. --&gt;</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Data acquisition**</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span><span class="co">[</span><span class="ot">Describe how data was collected, e.g. ACS 5-year estimates via the Census API using the `utah-housing` package.</span><span class="co">]</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Cleaning pipeline**</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span><span class="co">[</span><span class="ot">Describe cleaning steps: missing-value handling, column derivation, filtering, etc.</span><span class="co">]</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Analysis workflow**</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>*EDA:* <span class="co">[</span><span class="ot">Describe exploratory plots and summaries.</span><span class="co">]</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>*Model selection:* <span class="co">[</span><span class="ot">Describe the approach, e.g. best-subsets by AIC and LASSO.</span><span class="co">]</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>*Model assessment:* <span class="co">[</span><span class="ot">Describe evaluation method, e.g. 5-fold cross-validated PMSE.</span><span class="co">]</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Tooling and reproducibility**</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Primary libraries: <span class="in">`pandas`</span>, <span class="in">`numpy`</span>, <span class="in">`matplotlib`</span>, <span class="in">`seaborn`</span>, <span class="in">`statsmodels`</span>, <span class="in">`patsy`</span>, <span class="in">`scikit-learn`</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>Environment and packaging: see <span class="in">`pyproject.toml`</span></span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="fu">## EDA</span></span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="co">#| include: false</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> utah_housing <span class="im">import</span> OUTCOME, BASE_PREDICTORS, COMPLEX_PREDICTORS</span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Update path if data file lives elsewhere</span></span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_csv(<span class="st">"data/utah_housing.csv"</span>)</span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>df[<span class="st">"county_name"</span>] <span class="op">=</span> df[<span class="st">"NAME"</span>].<span class="bu">str</span>.extract(<span class="vs">r",</span><span class="dv">\s</span><span class="op">*</span><span class="kw">(</span><span class="dv">.</span><span class="op">+?</span><span class="kw">)</span><span class="dv">\s</span><span class="op">+</span><span class="vs">County"</span>, expand<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> df.dropna(subset<span class="op">=</span>[OUTCOME]).copy()</span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Replace variable names with your actual predictors.</span></span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a><span class="co"># The 2x2 layout below mirrors the example project structure.</span></span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">10</span>))</span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>fig.suptitle(<span class="st">"EDA: Outcome vs Selected Predictors"</span>, fontsize<span class="op">=</span><span class="dv">16</span>, fontweight<span class="op">=</span><span class="st">"bold"</span>)</span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 1 (top-left): Scatterplot — outcome vs predictor 1</span></span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 0].scatter(df["[predictor_1]"], df[OUTCOME], alpha=0.5, s=20, color="steelblue")</span></span>
-<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 0].set_xlabel("[Predictor 1 label]")</span></span>
-<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 0].set_ylabel(OUTCOME.replace("_", " ").title())</span></span>
-<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 0].set_title("Outcome vs [Predictor 1]", fontweight="bold")</span></span>
-<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 0].grid(True, alpha=0.3)</span></span>
-<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 2 (top-right): Scatterplot — outcome vs predictor 2</span></span>
-<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 1].scatter(df["[predictor_2]"], df[OUTCOME], alpha=0.5, s=20, color="coral")</span></span>
-<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 1].set_xlabel("[Predictor 2 label]")</span></span>
-<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 1].set_ylabel(OUTCOME.replace("_", " ").title())</span></span>
-<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 1].set_title("Outcome vs [Predictor 2]", fontweight="bold")</span></span>
-<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[0, 1].grid(True, alpha=0.3)</span></span>
-<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 3 (bottom-left): Scatterplot — outcome vs predictor 3</span></span>
-<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 0].scatter(df["[predictor_3]"], df[OUTCOME], alpha=0.5, s=20)</span></span>
-<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 0].set_xlabel("[Predictor 3 label]")</span></span>
-<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 0].set_ylabel(OUTCOME.replace("_", " ").title())</span></span>
-<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 0].set_title("Outcome vs [Predictor 3]", fontweight="bold")</span></span>
-<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 0].grid(True, alpha=0.3)</span></span>
-<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot 4 (bottom-right): Boxplot — outcome by a categorical variable (e.g. county)</span></span>
-<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a><span class="co"># counties_of_interest = ["[county_1]", "[county_2]", "[county_3]"]</span></span>
-<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a><span class="co"># sub_df = df[df["county_name"].isin(counties_of_interest)]</span></span>
-<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a><span class="co"># sub_df.boxplot(column=OUTCOME, by="county_name", ax=axes[1, 1])</span></span>
-<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 1].set_xlabel("County")</span></span>
-<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 1].set_ylabel(OUTCOME.replace("_", " ").title())</span></span>
-<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 1].set_title("Outcome by County", fontweight="bold")</span></span>
-<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a><span class="co"># axes[1, 1].get_figure().suptitle("")</span></span>
-<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Add trend-over-time plot (statewide median of outcome by year).</span></span>
-<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a><span class="co"># yearly = (</span></span>
-<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a><span class="co">#     df.groupby("year")[OUTCOME]</span></span>
-<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a><span class="co">#     .median()</span></span>
-<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a><span class="co">#     .reset_index()</span></span>
-<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a><span class="co"># fig2, ax = plt.subplots(figsize=(10, 4))</span></span>
-<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.plot(yearly["year"], yearly[OUTCOME], marker="o")</span></span>
-<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_xlabel("Year")</span></span>
-<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_ylabel(OUTCOME.replace("_", " ").title())</span></span>
-<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.set_title(f"Statewide Median {OUTCOME.replace('_', ' ').title()} Over Time")</span></span>
-<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a><span class="co"># ax.grid(alpha=0.3)</span></span>
-<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.show()</span></span>
-<span id="cb4-118"><a href="#cb4-118" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-119"><a href="#cb4-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a><span class="fu">## Link to Streamlit App</span></span>
-<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- </span><span class="al">TODO</span><span class="co">: Replace the URL once your Streamlit app is deployed. --&gt;</span></span>
-<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Link to Streamlit app</span><span class="co">](https://your-app-url.streamlit.app/)</span></span>
-<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a><span class="fu">## Analysis</span></span>
-<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> itertools</span>
-<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
-<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> patsy <span class="im">import</span> dmatrices</span>
-<span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> KFold</span>
-<span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LinearRegression, LassoCV, Lasso</span>
-<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
-<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.pipeline <span class="im">import</span> Pipeline</span>
-<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> mean_squared_error</span>
-<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Update cat_vars to reflect categorical columns in your dataset (e.g. county, year).</span></span>
-<span id="cb4-149"><a href="#cb4-149" aria-hidden="true" tabindex="-1"></a><span class="co"># cat_vars = ["county_name"]</span></span>
-<span id="cb4-150"><a href="#cb4-150" aria-hidden="true" tabindex="-1"></a><span class="co"># for c in cat_vars:</span></span>
-<span id="cb4-151"><a href="#cb4-151" aria-hidden="true" tabindex="-1"></a><span class="co">#     if c in df.columns:</span></span>
-<span id="cb4-152"><a href="#cb4-152" aria-hidden="true" tabindex="-1"></a><span class="co">#         df[c] = df[c].astype("category")</span></span>
-<span id="cb4-153"><a href="#cb4-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-154"><a href="#cb4-154" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Update candidates to the columns you want to consider as predictors.</span></span>
-<span id="cb4-155"><a href="#cb4-155" aria-hidden="true" tabindex="-1"></a><span class="co"># candidates = COMPLEX_PREDICTORS</span></span>
-<span id="cb4-156"><a href="#cb4-156" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-157"><a href="#cb4-157" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb4-158"><a href="#cb4-158" aria-hidden="true" tabindex="-1"></a><span class="co"># Best subsets selection via AIC</span></span>
-<span id="cb4-159"><a href="#cb4-159" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb4-160"><a href="#cb4-160" aria-hidden="true" tabindex="-1"></a><span class="co"># best_aic = np.inf</span></span>
-<span id="cb4-161"><a href="#cb4-161" aria-hidden="true" tabindex="-1"></a><span class="co"># best_formula = None</span></span>
-<span id="cb4-162"><a href="#cb4-162" aria-hidden="true" tabindex="-1"></a><span class="co"># best_model = None</span></span>
-<span id="cb4-163"><a href="#cb4-163" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb4-164"><a href="#cb4-164" aria-hidden="true" tabindex="-1"></a><span class="co"># for k in range(1, len(candidates) + 1):</span></span>
-<span id="cb4-165"><a href="#cb4-165" aria-hidden="true" tabindex="-1"></a><span class="co">#     for subset in itertools.combinations(candidates, k):</span></span>
-<span id="cb4-166"><a href="#cb4-166" aria-hidden="true" tabindex="-1"></a><span class="co">#         terms = [f"C({v})" if v in cat_vars else v for v in subset]</span></span>
-<span id="cb4-167"><a href="#cb4-167" aria-hidden="true" tabindex="-1"></a><span class="co">#         formula = f"{OUTCOME} ~ " + " + ".join(terms)</span></span>
-<span id="cb4-168"><a href="#cb4-168" aria-hidden="true" tabindex="-1"></a><span class="co">#         try:</span></span>
-<span id="cb4-169"><a href="#cb4-169" aria-hidden="true" tabindex="-1"></a><span class="co">#             model = smf.ols(formula, data=df).fit()</span></span>
-<span id="cb4-170"><a href="#cb4-170" aria-hidden="true" tabindex="-1"></a><span class="co">#             if model.aic &lt; best_aic:</span></span>
-<span id="cb4-171"><a href="#cb4-171" aria-hidden="true" tabindex="-1"></a><span class="co">#                 best_aic = model.aic</span></span>
-<span id="cb4-172"><a href="#cb4-172" aria-hidden="true" tabindex="-1"></a><span class="co">#                 best_formula = formula</span></span>
-<span id="cb4-173"><a href="#cb4-173" aria-hidden="true" tabindex="-1"></a><span class="co">#                 best_model = model</span></span>
-<span id="cb4-174"><a href="#cb4-174" aria-hidden="true" tabindex="-1"></a><span class="co">#         except Exception:</span></span>
-<span id="cb4-175"><a href="#cb4-175" aria-hidden="true" tabindex="-1"></a><span class="co">#             continue</span></span>
-<span id="cb4-176"><a href="#cb4-176" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb4-177"><a href="#cb4-177" aria-hidden="true" tabindex="-1"></a><span class="co"># print("Best AIC:", best_aic)</span></span>
-<span id="cb4-178"><a href="#cb4-178" aria-hidden="true" tabindex="-1"></a><span class="co"># print("Best formula:", best_formula)</span></span>
-<span id="cb4-179"><a href="#cb4-179" aria-hidden="true" tabindex="-1"></a><span class="co"># print(best_model.summary())</span></span>
-<span id="cb4-180"><a href="#cb4-180" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-181"><a href="#cb4-181" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb4-182"><a href="#cb4-182" aria-hidden="true" tabindex="-1"></a><span class="co"># CV PMSE for best-AIC model</span></span>
-<span id="cb4-183"><a href="#cb4-183" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb4-184"><a href="#cb4-184" aria-hidden="true" tabindex="-1"></a><span class="co"># y_aic, X_aic = dmatrices(best_formula, data=df, return_type="dataframe")</span></span>
-<span id="cb4-185"><a href="#cb4-185" aria-hidden="true" tabindex="-1"></a><span class="co"># y_aic = np.ravel(y_aic)</span></span>
-<span id="cb4-186"><a href="#cb4-186" aria-hidden="true" tabindex="-1"></a><span class="co"># kf = KFold(n_splits=5, shuffle=True, random_state=1)</span></span>
-<span id="cb4-187"><a href="#cb4-187" aria-hidden="true" tabindex="-1"></a><span class="co"># mses_aic = []</span></span>
-<span id="cb4-188"><a href="#cb4-188" aria-hidden="true" tabindex="-1"></a><span class="co"># for tr, te in kf.split(X_aic):</span></span>
-<span id="cb4-189"><a href="#cb4-189" aria-hidden="true" tabindex="-1"></a><span class="co">#     lr = LinearRegression(fit_intercept=False)</span></span>
-<span id="cb4-190"><a href="#cb4-190" aria-hidden="true" tabindex="-1"></a><span class="co">#     lr.fit(X_aic.iloc[tr], y_aic[tr])</span></span>
-<span id="cb4-191"><a href="#cb4-191" aria-hidden="true" tabindex="-1"></a><span class="co">#     preds = lr.predict(X_aic.iloc[te])</span></span>
-<span id="cb4-192"><a href="#cb4-192" aria-hidden="true" tabindex="-1"></a><span class="co">#     mses_aic.append(mean_squared_error(y_aic[te], preds))</span></span>
-<span id="cb4-193"><a href="#cb4-193" aria-hidden="true" tabindex="-1"></a><span class="co"># pmse_aic = np.mean(mses_aic)</span></span>
-<span id="cb4-194"><a href="#cb4-194" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-195"><a href="#cb4-195" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb4-196"><a href="#cb4-196" aria-hidden="true" tabindex="-1"></a><span class="co"># LASSO (lambda = 1-SE rule)</span></span>
-<span id="cb4-197"><a href="#cb4-197" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb4-198"><a href="#cb4-198" aria-hidden="true" tabindex="-1"></a><span class="co"># full_formula = f"{OUTCOME} ~ " + " + ".join(</span></span>
-<span id="cb4-199"><a href="#cb4-199" aria-hidden="true" tabindex="-1"></a><span class="co">#     [f"C({v})" if v in cat_vars else v for v in candidates]</span></span>
-<span id="cb4-200"><a href="#cb4-200" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb4-201"><a href="#cb4-201" aria-hidden="true" tabindex="-1"></a><span class="co"># y_lasso, X_lasso = dmatrices(full_formula, data=df, return_type="dataframe")</span></span>
-<span id="cb4-202"><a href="#cb4-202" aria-hidden="true" tabindex="-1"></a><span class="co"># y_lasso = np.ravel(y_lasso)</span></span>
-<span id="cb4-203"><a href="#cb4-203" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb4-204"><a href="#cb4-204" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_cv = Pipeline([</span></span>
-<span id="cb4-205"><a href="#cb4-205" aria-hidden="true" tabindex="-1"></a><span class="co">#     ("scaler", StandardScaler()),</span></span>
-<span id="cb4-206"><a href="#cb4-206" aria-hidden="true" tabindex="-1"></a><span class="co">#     ("lasso", LassoCV(cv=5, random_state=1))</span></span>
-<span id="cb4-207"><a href="#cb4-207" aria-hidden="true" tabindex="-1"></a><span class="co"># ])</span></span>
-<span id="cb4-208"><a href="#cb4-208" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_cv.fit(X_lasso, y_lasso)</span></span>
-<span id="cb4-209"><a href="#cb4-209" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb4-210"><a href="#cb4-210" aria-hidden="true" tabindex="-1"></a><span class="co"># mse_path = lasso_cv.named_steps["lasso"].mse_path_.mean(axis=1)</span></span>
-<span id="cb4-211"><a href="#cb4-211" aria-hidden="true" tabindex="-1"></a><span class="co"># mse_std  = lasso_cv.named_steps["lasso"].mse_path_.std(axis=1)</span></span>
-<span id="cb4-212"><a href="#cb4-212" aria-hidden="true" tabindex="-1"></a><span class="co"># idx_min  = np.argmin(mse_path)</span></span>
-<span id="cb4-213"><a href="#cb4-213" aria-hidden="true" tabindex="-1"></a><span class="co"># mse_1se  = mse_path[idx_min] + mse_std[idx_min]</span></span>
-<span id="cb4-214"><a href="#cb4-214" aria-hidden="true" tabindex="-1"></a><span class="co"># idx_1se  = np.where(mse_path &lt;= mse_1se)[0][-1]</span></span>
-<span id="cb4-215"><a href="#cb4-215" aria-hidden="true" tabindex="-1"></a><span class="co"># alpha_1se = lasso_cv.named_steps["lasso"].alphas_[idx_1se]</span></span>
-<span id="cb4-216"><a href="#cb4-216" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb4-217"><a href="#cb4-217" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_1se = Pipeline([</span></span>
-<span id="cb4-218"><a href="#cb4-218" aria-hidden="true" tabindex="-1"></a><span class="co">#     ("scaler", StandardScaler()),</span></span>
-<span id="cb4-219"><a href="#cb4-219" aria-hidden="true" tabindex="-1"></a><span class="co">#     ("lasso", Lasso(alpha=alpha_1se))</span></span>
-<span id="cb4-220"><a href="#cb4-220" aria-hidden="true" tabindex="-1"></a><span class="co"># ])</span></span>
-<span id="cb4-221"><a href="#cb4-221" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_1se.fit(X_lasso, y_lasso)</span></span>
-<span id="cb4-222"><a href="#cb4-222" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb4-223"><a href="#cb4-223" aria-hidden="true" tabindex="-1"></a><span class="co"># coef = lasso_1se.named_steps["lasso"].coef_</span></span>
-<span id="cb4-224"><a href="#cb4-224" aria-hidden="true" tabindex="-1"></a><span class="co"># selected = X_lasso.columns[coef != 0]</span></span>
-<span id="cb4-225"><a href="#cb4-225" aria-hidden="true" tabindex="-1"></a><span class="co"># print("LASSO selected variables:", list(selected))</span></span>
-<span id="cb4-226"><a href="#cb4-226" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-227"><a href="#cb4-227" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb4-228"><a href="#cb4-228" aria-hidden="true" tabindex="-1"></a><span class="co"># Refit OLS on LASSO-selected variables</span></span>
-<span id="cb4-229"><a href="#cb4-229" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb4-230"><a href="#cb4-230" aria-hidden="true" tabindex="-1"></a><span class="co"># selected_vars = set()</span></span>
-<span id="cb4-231"><a href="#cb4-231" aria-hidden="true" tabindex="-1"></a><span class="co"># for col in selected:</span></span>
-<span id="cb4-232"><a href="#cb4-232" aria-hidden="true" tabindex="-1"></a><span class="co">#     if col.startswith("C("):</span></span>
-<span id="cb4-233"><a href="#cb4-233" aria-hidden="true" tabindex="-1"></a><span class="co">#         var = col.split("[")[0].replace("C(", "").replace(")", "")</span></span>
-<span id="cb4-234"><a href="#cb4-234" aria-hidden="true" tabindex="-1"></a><span class="co">#         selected_vars.add(f"C({var})")</span></span>
-<span id="cb4-235"><a href="#cb4-235" aria-hidden="true" tabindex="-1"></a><span class="co">#     else:</span></span>
-<span id="cb4-236"><a href="#cb4-236" aria-hidden="true" tabindex="-1"></a><span class="co">#         selected_vars.add(col)</span></span>
-<span id="cb4-237"><a href="#cb4-237" aria-hidden="true" tabindex="-1"></a><span class="co"># selected_vars = sorted(selected_vars)</span></span>
-<span id="cb4-238"><a href="#cb4-238" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_formula = f"{OUTCOME} ~ " + " + ".join(selected_vars)</span></span>
-<span id="cb4-239"><a href="#cb4-239" aria-hidden="true" tabindex="-1"></a><span class="co"># lasso_refit = smf.ols(lasso_formula, data=df).fit()</span></span>
-<span id="cb4-240"><a href="#cb4-240" aria-hidden="true" tabindex="-1"></a><span class="co"># print(lasso_refit.summary())</span></span>
-<span id="cb4-241"><a href="#cb4-241" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-242"><a href="#cb4-242" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb4-243"><a href="#cb4-243" aria-hidden="true" tabindex="-1"></a><span class="co"># CV PMSE for LASSO-selected model</span></span>
-<span id="cb4-244"><a href="#cb4-244" aria-hidden="true" tabindex="-1"></a><span class="co"># ----------------------------</span></span>
-<span id="cb4-245"><a href="#cb4-245" aria-hidden="true" tabindex="-1"></a><span class="co"># y_lasso2, X_lasso2 = dmatrices(lasso_formula, data=df, return_type="dataframe")</span></span>
-<span id="cb4-246"><a href="#cb4-246" aria-hidden="true" tabindex="-1"></a><span class="co"># y_lasso2 = np.ravel(y_lasso2)</span></span>
-<span id="cb4-247"><a href="#cb4-247" aria-hidden="true" tabindex="-1"></a><span class="co"># mses_lasso = []</span></span>
-<span id="cb4-248"><a href="#cb4-248" aria-hidden="true" tabindex="-1"></a><span class="co"># for tr, te in kf.split(X_lasso2):</span></span>
-<span id="cb4-249"><a href="#cb4-249" aria-hidden="true" tabindex="-1"></a><span class="co">#     lr = LinearRegression(fit_intercept=False)</span></span>
-<span id="cb4-250"><a href="#cb4-250" aria-hidden="true" tabindex="-1"></a><span class="co">#     lr.fit(X_lasso2.iloc[tr], y_lasso2[tr])</span></span>
-<span id="cb4-251"><a href="#cb4-251" aria-hidden="true" tabindex="-1"></a><span class="co">#     preds = lr.predict(X_lasso2.iloc[te])</span></span>
-<span id="cb4-252"><a href="#cb4-252" aria-hidden="true" tabindex="-1"></a><span class="co">#     mses_lasso.append(mean_squared_error(y_lasso2[te], preds))</span></span>
-<span id="cb4-253"><a href="#cb4-253" aria-hidden="true" tabindex="-1"></a><span class="co"># pmse_lasso = np.mean(mses_lasso)</span></span>
-<span id="cb4-254"><a href="#cb4-254" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb4-255"><a href="#cb4-255" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"Best Subsets (AIC) PMSE : {pmse_aic:.3f}")</span></span>
-<span id="cb4-256"><a href="#cb4-256" aria-hidden="true" tabindex="-1"></a><span class="co"># print(f"LASSO (1SE) PMSE        : {pmse_lasso:.3f}")</span></span>
-<span id="cb4-257"><a href="#cb4-257" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-258"><a href="#cb4-258" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-259"><a href="#cb4-259" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb4-260"><a href="#cb4-260" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-261"><a href="#cb4-261" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conclusion</span></span>
-<span id="cb4-262"><a href="#cb4-262" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-263"><a href="#cb4-263" aria-hidden="true" tabindex="-1"></a><span class="co">&lt;!-- </span><span class="al">TODO</span><span class="co">: Write 3–5 paragraphs covering:</span></span>
-<span id="cb4-264"><a href="#cb4-264" aria-hidden="true" tabindex="-1"></a><span class="co">     (1) summary of model comparison results (AIC best-subsets vs LASSO),</span></span>
-<span id="cb4-265"><a href="#cb4-265" aria-hidden="true" tabindex="-1"></a><span class="co">     (2) key predictors and their direction/magnitude,</span></span>
-<span id="cb4-266"><a href="#cb4-266" aria-hidden="true" tabindex="-1"></a><span class="co">     (3) cross-validation PMSE comparison and what it implies,</span></span>
-<span id="cb4-267"><a href="#cb4-267" aria-hidden="true" tabindex="-1"></a><span class="co">     (4) limitations (data quality, potential bias, model assumptions),</span></span>
-<span id="cb4-268"><a href="#cb4-268" aria-hidden="true" tabindex="-1"></a><span class="co">     (5) future work (additional variables, nonlinear models, spatial effects, deployment). --&gt;</span></span>
-<span id="cb4-269"><a href="#cb4-269" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-270"><a href="#cb4-270" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Conclusion goes here.</span><span class="co">]</span></span>
-</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Technical Report"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">## Abstract ##</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>A prominent topic over the past decade has been the continued rise in prices of single-family homes in America. Prices of housing contribute to wealth inequality and perpetuate barriers to family formation and upward mobility, which negatively affect many crises that the United States of America currently faces. Our hope with this project was to gain some empirical insight into why housing has become less accessible for young Americans in recent years. Using a fixed-panel regression model, we were able to isolate household income and owner-renter income gap as the two strongest predictors of rising ownership costs. </span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">## Introduction ##</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>Over the past decade, a prominent social and economic issue has been the lack of accessibility to housing. The notion of the American Dream suggests that all citizens should be afforded the privilege of owning a house provided they work hard and manage money accordingly, but in recent years, this dream has become less realistic for many Americans. </span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>While it would have been ideal to look into single-family home purchase accessibility for the entirety of the United States of America, given the constraints we were working with, we decided to focus on data from Utah, found through the US Census. </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data Acquisition and Wrangling ##</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>Data was obtained through the US Census Bureau's American Community Survey (2013-2023). We constructed a dataset spanning 772 census tracts across Utah. </span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Selection and Validation ##</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>We built a two-way fixed effects (or fixed panel) regression model to identify within-tract drivers of ownership costs. We initially wanted to use a simple multiple linear regression model, but found that we were explaining almost none of the variance in our data. A fixed effects model helps to remedy the inevitable unknown elements of variance in such an economic model, as it holds certain elements constant to account for inherent variance. </span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>Our model controls for tract-level fixed effects, meaning time-invariant characteristics of a neighborhood like location and county $\times$ year fixed effects, which account for unknown variables like employer expansion and COVID-era impacts. </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>The model is as follows: </span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>y_{it} = \beta X_{it} + \alpha_i + \lambda_{c(i), t} + u_{i,t}</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>where $i =$ tract (Census GEOID), $t =$ year, and $c(i) =$ county of tract $i$.</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>$\alpha_i$ stands for tract fixed effect, which controls for anything constant within a tract over time, like location desirability, zoning baseline, and neighborhood quality. In other words, $\alpha$ lets us compare a tract to itself over time. </span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>$\lambda_{c(i), t}$ stands for the county $\times$ year fixed effect, controlling for anything affecting a county in a specific year; things like local economic shocks (ex: big employer entering or leaving), policy changes, or impacts from COVID. In other words, $\lambda_{c(i), t}$ allows us to remove shared shocks across nearby areas at the same time.</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Building </span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## Analyses, Results, and Interpretation ##</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>A table depicting the results of the fixed panel model is below. </span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fixed Effects Model (Tract FE + County×Year FE)</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Variable                     <span class="pp">|</span> Coef     <span class="pp">|</span> Std. Err. <span class="pp">|</span> t-stat <span class="pp">|</span> p-value <span class="pp">|</span> CI Low   <span class="pp">|</span> CI High  <span class="pp">|</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="pp">|------------------------------|----------|-----------|--------|---------|----------|----------|</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> pct_sf_renter_occupied       <span class="pp">|</span> -103.558 <span class="pp">|</span> 64.051    <span class="pp">|</span> -1.617 <span class="pp">|</span> 0.106   <span class="pp">|</span> -229.097 <span class="pp">|</span> 21.981   <span class="pp">|</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> median_household_income      <span class="pp">|</span> 0.0018   <span class="pp">|</span> 0.0004    <span class="pp">|</span> 4.851  <span class="pp">|</span> 0.000   <span class="pp">|</span> 0.0011   <span class="pp">|</span> 0.0026   <span class="pp">|</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> owner_renter_income_gap      <span class="pp">|</span> 0.0006   <span class="pp">|</span> 0.0002    <span class="pp">|</span> 3.925  <span class="pp">|</span> 0.000   <span class="pp">|</span> 0.0003   <span class="pp">|</span> 0.0009   <span class="pp">|</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> pct_vacant                   <span class="pp">|</span> 31.207   <span class="pp">|</span> 72.176    <span class="pp">|</span> 0.432  <span class="pp">|</span> 0.666   <span class="pp">|</span> -110.258 <span class="pp">|</span> 172.673  <span class="pp">|</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> pop_in_occupied_total        <span class="pp">|</span> 0.0088   <span class="pp">|</span> 0.0046    <span class="pp">|</span> 1.934  <span class="pp">|</span> 0.053   <span class="pp">|</span> -0.0001  <span class="pp">|</span> 0.0178   <span class="pp">|</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>**Observations:** 8,284  </span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>**Absorbed R²:** 0.9455</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>The complexity of this model leads to a lot of things to consider. For example, while "Absorbed $R^2$" is impressively high, the county $\times$ year fixed effect will by nature increase the $R^2$ metric. So, we need to use other, more subjective metrics to judge the validity of our model. We found after fitting two different models (the first being a one-way fixed effects model) that main variables were more stable in our current model. </span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>In particular, the coefficients on median household income and the owner-renter income gap remained consistent in both magnitude and statistical significance, suggesting that these relationships are not driven by broader county-level shocks. Overall, this stability across model specifications provides evidence that our results are not sensitive to unobserved, time-varying county-level factors, and supports the use of the more complex model as a credible framework for identifying within-tract drivers of housing costs.</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conclusions ##</span></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>We were successfully able to establish that significant contributors to the rise in house prices in Utah are median household income, the owner-renter income gap, and population growth. </span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>While there are still many questions we would like to explore, like "how do zoning laws affect house prices?" and "is it really less profitable to build less expensive homes?", we consider this project a success. </span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

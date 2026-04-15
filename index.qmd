@@ -1,24 +1,13 @@
 ---
-title: "Utah Housing Affordability Project"
+title: "Utah Housing Affordability Analysis - STAT 386"
 ---
 
-<!-- TODO: Add a banner image of Utah (e.g. a landscape or map) -->
-<!-- ![Project Banner](your_image.png) -->
+This is a project website by Sujin Leek and Matthew Conger recording our work with US Census Data regarding Utah housing. We were curious as to what specific factors were affecting the decrease in affordability and availability of single-family homes in Utah.
 
-<!-- TODO: Write a 2–3 sentence overview of the project: what data is used, what question is being
-     answered, and who the intended audience is. -->
+A streamlit app for seeing exploratory data analysis and plots can be found [here.](https://stat386utahhousingproject.streamlit.app/)
 
-[Brief project overview goes here.]
+A link to the Github Repository for the Python package used to complete this analysis [here.](https://github.com/Congerm/Utah_Housing_Project) 
 
----
+This website includes a technical report, documentation, and a tutorial. Navigate using the tabs above. 
 
-## What's Inside
 
-- **[Documentation](Documentation.qmd)** — Data source, variables, and the `utah-housing` Python package.
-- **[Tutorial](Tutorial.qmd)** — Step-by-step guide to fetching, cleaning, and exploring the data.
-- **[Technical Report](TechnicalReport.qmd)** — EDA, modeling, and findings.
-- **[Interactive App](https://stat386utahhousingproject.streamlit.app/)** — Explore the data live with the Streamlit app.
-
----
-
-<!-- TODO: Add a short "Key Findings" or "Highlights" section once analysis is complete. -->

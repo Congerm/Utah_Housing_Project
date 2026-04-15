@@ -1,12 +1,10 @@
 ---
 title: "Tutorial: Accessing and Exploring the Data"
-jupyter: utah-housing-project
+execute: 
+    enabled: false
 ---
 
-<!-- TODO: Write a brief intro sentence explaining what this tutorial covers. -->
-
-[Tutorial intro goes here — e.g. "This tutorial walks through fetching, cleaning, and doing
-initial exploration of the Utah housing affordability dataset."]
+This tutorial walks through fetching, cleaning, and doing initial exploration of the Utah housing affordability dataset.
 
 ---
 
@@ -74,9 +72,8 @@ df[analysis_cols].isnull().sum()
 
 ---
 
-## Cleaning the Data
+## Cleaning the Data (not necessary for analysis with package)
 
-<!-- TODO: Describe any cleaning steps specific to your data (dropping nulls, filtering counties, etc.) -->
 
 ```{python}
 #| eval: false
@@ -116,8 +113,5 @@ df_clean[summary_cols].describe().round(2)
 ```
 
 ---
-
-<!-- TODO: Add any additional exploratory steps that are relevant to your analysis question,
-     e.g. group-by summaries, value counts for categorical variables, etc. -->
 
 The data is now ready for EDA and modeling (see the [Technical Report](TechnicalReport.qmd)).

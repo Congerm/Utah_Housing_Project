@@ -1,7 +1,5 @@
 # Utah Housing Affordability Project — STAT 386
 
-<!-- TODO: Update this README with final project details once analysis is complete. -->
-
 ## Overview
 
 This project analyzes Utah housing affordability using ACS 5-year estimates for Utah census
