@@ -6,53 +6,52 @@ execute:
 
 ## **Overview**
 
-<!-- TODO: Write a 2–3 sentence description of what the project does and what data source it uses. -->
-
-[Project and data source overview goes here.]
+With this project, we hoped to answer the question: what factors are driving an decrease in single-family-home availability in Utah? We used US Census data, available through (census.gov)[census.gov] to facilitate our analysis. 
 
 ---
 
 ## **Data Source**
 
-<!-- TODO: Describe where the data comes from (e.g. U.S. Census Bureau ACS 5-year estimates).
-     Include a link to the source and any relevant details about geographic scope and time range. -->
+The data comes from various tables available through the US Census Bureau. One observation corresponds to a single census tract in a single year, meaning there are hundreds of observations per year. We pull for years 2009-2023, but analyze only 2013-2023, that being the year economists have generally decided that the US economy recovered from the 2008 recession.  
 
-| Property | Details |
+| Table | Details |
 |----------|---------|
-| **Source** | [Data source name and URL] |
-| **Coverage** | [Geographic scope, e.g. Utah census tracts] |
-| **Years** | [Year range, e.g. 2009–2023] |
-| **Unit of observation** | [e.g. Census tract × year] |
-| **Total rows** | [e.g. ~9,240] |
+| **B25024** | Units in Structure |
+| **B25001** | Housing Units |
+| **B25003** | Tenure (Owner Occupied vs Renter Occupied) |
+| **B25008** | Total Population in Occupied Housing Units by Tenure |
+| **B25119** | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) by Tenure |
+| **B25032** | Tenure by Units in Structure |
+| **B25088** | Median Selected Monthly Owner Costs (Dollars) by Mortgage Status |
+| **B19013** | Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) |
 
 ---
 
 ## **Key Variables**
 
-<!-- TODO: Fill in the variable table with actual column names from your dataset.
-     The table below mirrors the structure in the example project. -->
+Note that three of the five predictors are derived from other variables; while it seems counterintuitive to pull eight tables and only use five predictors, each table is necessary for the analysis. 
 
 ### Outcome Variable
 
 | Variable | Description |
 |----------|-------------|
-| `[outcome_variable]` | [What it measures, e.g. median monthly owner costs with mortgage] |
+| `[median_owner_costs_with_mortgage]` | [median monthly owner costs, with mortgage] |
+ 
 
 ### Predictors
 
 | Variable | Description |
 |----------|-------------|
-| `[predictor_1]` | [Description] |
-| `[predictor_2]` | [Description] |
-| `[predictor_3]` | [Description] |
-| `[predictor_4]` | [Description] |
-| `[predictor_5]` | [Description] |
+| `[pct_sf_renter_occupied]` | [renter_single_family / single_family_units] |
+| `[median_household_income]` | [Description] |
+| `[owner_renter_income_gap]` | [median_income_owner_occupied - median_income_renter_occupied] |
+| `[pct_vacant]` | [vacant_units / total_units_b25002] |
+| `[pop_in_occupied_total]` | [Description] |
 
 ---
 
 ## **Python Package: `utah-housing`**
 
-<!-- TODO: Update the package name if it differs. Describe what the package provides. -->
 
 The `utah-housing` package provides functions to fetch ACS data directly from the Census API and
 compute derived housing affordability metrics.
@@ -75,33 +74,45 @@ pip install utah-housing
 ```{python}
 #| eval: false
 
-from utah_housing import fetch_all_years, OUTCOME, BASE_PREDICTORS, COMPLEX_PREDICTORS
+from utah_housing import fetch_all_years, OUTCOME, PREDICTORS
 
 # Fetch ACS 5-year estimates for all years
 df = fetch_all_years(years=range(2009, 2024))
 
 # Inspect variable groupings
 print("Outcome:", OUTCOME)
-print("Base predictors:", BASE_PREDICTORS)
-print("Complex predictors:", COMPLEX_PREDICTORS)
+print("Predictors:", PREDICTORS)
 ```
-
-### Function Reference
-
-<!-- TODO: Expand with all public functions in the package. -->
 
 | Function | Description |
 |----------|-------------|
 | `fetch_all_years(years)` | Fetches ACS 5-year estimates for all Utah census tracts across the given year range |
 | `OUTCOME` | String constant naming the outcome variable |
-| `BASE_PREDICTORS` | List of basic predictor variable names |
-| `COMPLEX_PREDICTORS` | List of extended predictor variable names |
+| `PREDICTORS` | List of extended predictor variable names |
 
 ---
 
 ## **License**
 
-<!-- TODO: Confirm and update license text. -->
+Copyright (c) 2018 The Python Packaging Authority
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 MIT 2025
 
