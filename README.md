@@ -4,7 +4,7 @@
 
 This project analyzes Utah housing affordability using ACS 5-year estimates for Utah census
 tracts (2009–2023). It includes a Quarto website, a Streamlit interactive app, and a data
-acquisition notebook.
+acquisition notebook. 
 
 ---
 
@@ -30,38 +30,49 @@ Utah_Housing_Project/
 
 ---
 
-## Quickstart
+## Quickstart (see [project website](https://congerm.github.io/Utah_Housing_Project/) for more details)
 
-### 1. Install dependencies
-
-```bash
-pip install -e .
-# or
-uv sync
-```
-
-### 2. Fetch the data
-
-Open and run `data_acquisition.ipynb`. You will need a free Census API key:
-<https://api.census.gov/data/key_signup.html>
-
-### 3. Run the Streamlit app
-
-Live app: <https://stat386utahhousingproject.streamlit.app/>
-
-Or run locally:
+Note: looking at the README for [this repository](https://github.com/smleek/utah_housing) will be much more helpful!! 
 
 ```bash
-streamlit run app.py
+pip install utah-housing
 ```
 
-### 4. Build the Quarto website
+> **Note:** A free Census API key is required. Obtain one at
+> <https://api.census.gov/data/key_signup.html> and set it as an environment variable:
+>
+> ```bash
+> export CENSUS_API_KEY="your_key_here"
+> ```
 
-```bash
-quarto render
+### Core Functions
+
+```{python}
+#| eval: false
+
+from utah_housing import fetch_year, fetch_all_years, OUTCOME, PREDICTORS, run_model, run_diagnostics
+
+# Fetch ACS 5-year estimates for all years
+df = fetch_all_years(years=range(2009, 2024))
+
+# Inspect variable groupings
+print("Outcome:", OUTCOME)
+print("Predictors:", PREDICTORS)
 ```
+
+| Function | Description |
+|----------|-------------|
+| `fetch_year` | Fetches ACS estimates for all Utah census tracts across the given year |
+| `fetch_all_years(years)` | Fetches ACS estimates for all Utah census tracts across the given year range |
+| `OUTCOME` | String constant naming the outcome variable |
+| `PREDICTORS` | List of extended predictor variable names |
+| `run_model` | Builds fixed-effects model as described in technical report | 
+| `run_diagnostics` | Makes sure VIFs and pairwise correlations are acceptable | 
+
 
 ---
+
+
 
 ## Website Pages
 
@@ -69,11 +80,31 @@ quarto render
 |------|------|-------------|
 | Home | `index.qmd` | Project overview |
 | Documentation | `Documentation.qmd` | Data source, variables, package reference |
-| Tutorial | `Tutorial.qmd` | Fetch, clean, and explore the data |
-| Technical Report | `TechnicalReport.qmd` | EDA, model selection, findings |
+| Tutorial | `Tutorial.qmd` | Fetch and clean data; build model |
+| Technical Report | `TechnicalReport.qmd` | Model selection and findings; more detailed writings |
 
 ---
 
 ## License
+
+Copyright (c) 2018 The Python Packaging Authority
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 MIT 2025

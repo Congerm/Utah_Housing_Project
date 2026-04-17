@@ -74,7 +74,7 @@ pip install utah-housing
 ```{python}
 #| eval: false
 
-from utah_housing import fetch_all_years, OUTCOME, PREDICTORS
+from utah_housing import fetch_year, fetch_all_years, OUTCOME, PREDICTORS, run_model, run_diagnostics
 
 # Fetch ACS 5-year estimates for all years
 df = fetch_all_years(years=range(2009, 2024))
@@ -86,9 +86,12 @@ print("Predictors:", PREDICTORS)
 
 | Function | Description |
 |----------|-------------|
-| `fetch_all_years(years)` | Fetches ACS 5-year estimates for all Utah census tracts across the given year range |
+| `fetch_year` | Fetches ACS estimates for all Utah census tracts across the given year |
+| `fetch_all_years(years)` | Fetches ACS estimates for all Utah census tracts across the given year range |
 | `OUTCOME` | String constant naming the outcome variable |
 | `PREDICTORS` | List of extended predictor variable names |
+| `run_model` | Builds fixed-effects model as described in technical report | 
+| `run_diagnostics` | Makes sure VIFs and pairwise correlations are acceptable | 
 
 ---
 

@@ -64,8 +64,11 @@ In short, the estimation procedure follows these steps:
 
 1. Prepare and clean the dataset
 
+```{python}
+#| eval: false
 clean = _prepare(df, PREDICTORS)
 clean["county_year"] = clean["county"].astype(str) + "_" + clean["year"].astype(str)
+```
 
 2. Construct predictor matrix $X$ and outcome $y$
 

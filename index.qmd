@@ -8,6 +8,8 @@ A streamlit app for seeing exploratory data analysis and plots can be found [her
 
 A link to the Github Repository for the Python package used to complete this analysis [here.](https://github.com/smleek/utah_housing) 
 
+See the package at pypi.org [here. ](https://pypi.org/project/utah-housing/)
+
 This website includes a technical report, documentation, and a tutorial. Navigate using the tabs above. 
 
 
