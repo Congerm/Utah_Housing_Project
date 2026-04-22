@@ -1,86 +1,96 @@
 ---
 title: "Tutorial: Accessing and Exploring the Data"
-execute: 
-    enabled: false
 ---
 
-This tutorial walks through fetching, cleaning, and doing initial exploration of the Utah housing affordability dataset.
+This tutorial walks through fetching, cleaning, and doing initial exploration of the Utah housing affordability dataset. If you want to follow along interactively, download and run [**getting_started.ipynb**](getting_started.ipynb) — it contains all the same steps as this page in a ready-to-run Jupyter notebook.
 
 ---
 
-## Installation
+## 1. Installation
 
-Install the `utah-housing` package and set your Census API key before running any code cells.
+Install the `utah-housing` package before running any code:
 
 ```bash
 pip install utah-housing
 ```
 
-Set your Census API key (obtain a free key at <https://api.census.gov/data/key_signup.html>):
+You will also need a free Census API key. Obtain one at <https://api.census.gov/data/key_signup.html>, then set it as an environment variable:
 
-```{python}
-#| eval: false
+```python
 import os
 os.environ["CENSUS_API_KEY"] = "your_census_api_key_here"
 ```
 
+> **Tip:** Never commit your API key to git. Consider storing it in a `.env` file and loading it with `python-dotenv`.
+
 ---
 
-## Reading in the Data
+## 2. Fetching the Data
 
-```{python}
-#| eval: false
+The `fetch_all_years` function pulls ACS 5-year estimates for all Utah census tracts across the years you specify. This calls the Census API once per year, so it may take a minute or two.
+
+```python
 import pandas as pd
-from utah_housing import fetch_all_years, OUTCOME, BASE_PREDICTORS, COMPLEX_PREDICTORS
+from utah_housing import fetch_all_years, OUTCOME, PREDICTORS
 
-# Fetch ACS 5-year estimates for Utah census tracts, 2009–2023
 df = fetch_all_years(years=range(2009, 2024))
+print(f"Total rows: {len(df):,}")
 df.head()
 ```
 
-```{python}
-#| eval: false
-# Save to CSV so you can reload without hitting the API again
+Once fetched, save the result to CSV so you don't need to hit the API again:
+
+```python
+import os
+os.makedirs("data", exist_ok=True)
 df.to_csv("data/utah_housing.csv", index=False)
+print("Saved to data/utah_housing.csv")
 ```
 
-```{python}
-#| eval: false
-# Reload from CSV (faster than re-fetching)
+On future sessions, reload from the CSV directly:
+
+```python
 df = pd.read_csv("data/utah_housing.csv")
-df.head()
 ```
 
 ---
 
-## Initial Exploration
+## 3. Initial Exploration
 
-```{python}
-#| eval: false
+Get a quick sense of the dataset's shape and the variable groupings provided by the package:
+
+```python
 print("Shape:", df.shape)
 print("\nOutcome variable:", OUTCOME)
-print("Base predictors:", BASE_PREDICTORS)
-print("Complex predictors:", COMPLEX_PREDICTORS)
+print("Predictors:", PREDICTORS)
 ```
 
-```{python}
-#| eval: false
-# Check for missing values in key columns
-analysis_cols = ["year", "GEOID"] + [OUTCOME] + COMPLEX_PREDICTORS
+Check column types and look for missing values in the key analysis columns:
+
+```python
+df.dtypes
+```
+
+```python
+analysis_cols = ["year", "GEOID"] + [OUTCOME] + PREDICTORS
 df[analysis_cols].isnull().sum()
 ```
 
+Get a statistical summary of the full dataset:
+
+```python
+df.describe()
+```
+
 ---
 
-## Cleaning the Data (not necessary for analysis with package)
+## 4. Cleaning the Data
 
+The package returns fairly clean data, but you may want to drop rows missing the outcome variable and extract a readable county name for easier filtering:
 
-```{python}
-#| eval: false
-# Drop rows missing the outcome variable
+```python
 df_clean = df.dropna(subset=[OUTCOME]).copy()
 
-# Extract county name from the NAME field for easier filtering
 df_clean["county_name"] = df_clean["NAME"].str.extract(r",\s*(.+?)\s+County", expand=False)
 
 print(f"Rows after cleaning: {len(df_clean):,}")
@@ -89,29 +99,27 @@ df_clean.head()
 
 ---
 
-## Subsetting by County or Year
+## 5. Subsetting by County or Year
 
-```{python}
-#| eval: false
-# Filter to a specific county
+Filter to a specific county or a specific year for focused analysis:
+
+```python
 salt_lake = df_clean[df_clean["county_name"] == "Salt Lake"]
 print(salt_lake.shape)
 
-# Filter to a specific year
 df_2023 = df_clean[df_clean["year"] == 2023]
 print(df_2023.shape)
 ```
 
 ---
 
-## Basic Summary Statistics
+## 6. Basic Summary Statistics
 
-```{python}
-#| eval: false
-summary_cols = [OUTCOME] + COMPLEX_PREDICTORS
+```python
+summary_cols = [OUTCOME] + PREDICTORS
 df_clean[summary_cols].describe().round(2)
 ```
 
 ---
 
-The data is now ready for EDA and modeling (see the [Technical Report](TechnicalReport.qmd)).
+The data is now ready for EDA and modeling. See the [Technical Report](TechnicalReport.qmd) for the full analysis, or run [getting_started.ipynb](getting_started.ipynb) to work through these steps yourself.

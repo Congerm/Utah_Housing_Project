@@ -4,49 +4,49 @@
     "href": "Tutorial.html",
     "title": "Tutorial: Accessing and Exploring the Data",
     "section": "",
-    "text": "This tutorial walks through fetching, cleaning, and doing initial exploration of the Utah housing affordability dataset."
+    "text": "This tutorial walks through fetching, cleaning, and doing initial exploration of the Utah housing affordability dataset. If you want to follow along interactively, download and run getting_started.ipynb — it contains all the same steps as this page in a ready-to-run Jupyter notebook."
   },
   {
     "objectID": "Tutorial.html#installation",
     "href": "Tutorial.html#installation",
     "title": "Tutorial: Accessing and Exploring the Data",
-    "section": "Installation",
-    "text": "Installation\nInstall the utah-housing package and set your Census API key before running any code cells.\npip install utah-housing\nSet your Census API key (obtain a free key at https://api.census.gov/data/key_signup.html):\n\nimport os\nos.environ[\"CENSUS_API_KEY\"] = \"your_census_api_key_here\""
+    "section": "1. Installation",
+    "text": "1. Installation\nInstall the utah-housing package before running any code:\npip install utah-housing\nYou will also need a free Census API key. Obtain one at https://api.census.gov/data/key_signup.html, then set it as an environment variable:\nimport os\nos.environ[\"CENSUS_API_KEY\"] = \"your_census_api_key_here\"\n\nTip: Never commit your API key to git. Consider storing it in a .env file and loading it with python-dotenv."
   },
   {
-    "objectID": "Tutorial.html#reading-in-the-data",
-    "href": "Tutorial.html#reading-in-the-data",
+    "objectID": "Tutorial.html#fetching-the-data",
+    "href": "Tutorial.html#fetching-the-data",
     "title": "Tutorial: Accessing and Exploring the Data",
-    "section": "Reading in the Data",
-    "text": "Reading in the Data\n\nimport pandas as pd\nfrom utah_housing import fetch_all_years, OUTCOME, BASE_PREDICTORS, COMPLEX_PREDICTORS\n\n# Fetch ACS 5-year estimates for Utah census tracts, 2009–2023\ndf = fetch_all_years(years=range(2009, 2024))\ndf.head()\n\n\n# Save to CSV so you can reload without hitting the API again\ndf.to_csv(\"data/utah_housing.csv\", index=False)\n\n\n# Reload from CSV (faster than re-fetching)\ndf = pd.read_csv(\"data/utah_housing.csv\")\ndf.head()"
+    "section": "2. Fetching the Data",
+    "text": "2. Fetching the Data\nThe fetch_all_years function pulls ACS 5-year estimates for all Utah census tracts across the years you specify. This calls the Census API once per year, so it may take a minute or two.\nimport pandas as pd\nfrom utah_housing import fetch_all_years, OUTCOME, PREDICTORS\n\ndf = fetch_all_years(years=range(2009, 2024))\nprint(f\"Total rows: {len(df):,}\")\ndf.head()\nOnce fetched, save the result to CSV so you don’t need to hit the API again:\nimport os\nos.makedirs(\"data\", exist_ok=True)\ndf.to_csv(\"data/utah_housing.csv\", index=False)\nprint(\"Saved to data/utah_housing.csv\")\nOn future sessions, reload from the CSV directly:\ndf = pd.read_csv(\"data/utah_housing.csv\")"
   },
   {
     "objectID": "Tutorial.html#initial-exploration",
     "href": "Tutorial.html#initial-exploration",
     "title": "Tutorial: Accessing and Exploring the Data",
-    "section": "Initial Exploration",
-    "text": "Initial Exploration\n\nprint(\"Shape:\", df.shape)\nprint(\"\\nOutcome variable:\", OUTCOME)\nprint(\"Base predictors:\", BASE_PREDICTORS)\nprint(\"Complex predictors:\", COMPLEX_PREDICTORS)\n\n\n# Check for missing values in key columns\nanalysis_cols = [\"year\", \"GEOID\"] + [OUTCOME] + COMPLEX_PREDICTORS\ndf[analysis_cols].isnull().sum()"
+    "section": "3. Initial Exploration",
+    "text": "3. Initial Exploration\nGet a quick sense of the dataset’s shape and the variable groupings provided by the package:\nprint(\"Shape:\", df.shape)\nprint(\"\\nOutcome variable:\", OUTCOME)\nprint(\"Predictors:\", PREDICTORS)\nCheck column types and look for missing values in the key analysis columns:\ndf.dtypes\nanalysis_cols = [\"year\", \"GEOID\"] + [OUTCOME] + PREDICTORS\ndf[analysis_cols].isnull().sum()\nGet a statistical summary of the full dataset:\ndf.describe()"
   },
   {
-    "objectID": "Tutorial.html#cleaning-the-data-not-necessary-for-analysis-with-package",
-    "href": "Tutorial.html#cleaning-the-data-not-necessary-for-analysis-with-package",
+    "objectID": "Tutorial.html#cleaning-the-data",
+    "href": "Tutorial.html#cleaning-the-data",
     "title": "Tutorial: Accessing and Exploring the Data",
-    "section": "Cleaning the Data (not necessary for analysis with package)",
-    "text": "Cleaning the Data (not necessary for analysis with package)\n\n# Drop rows missing the outcome variable\ndf_clean = df.dropna(subset=[OUTCOME]).copy()\n\n# Extract county name from the NAME field for easier filtering\ndf_clean[\"county_name\"] = df_clean[\"NAME\"].str.extract(r\",\\s*(.+?)\\s+County\", expand=False)\n\nprint(f\"Rows after cleaning: {len(df_clean):,}\")\ndf_clean.head()"
+    "section": "4. Cleaning the Data",
+    "text": "4. Cleaning the Data\nThe package returns fairly clean data, but you may want to drop rows missing the outcome variable and extract a readable county name for easier filtering:\ndf_clean = df.dropna(subset=[OUTCOME]).copy()\n\ndf_clean[\"county_name\"] = df_clean[\"NAME\"].str.extract(r\",\\s*(.+?)\\s+County\", expand=False)\n\nprint(f\"Rows after cleaning: {len(df_clean):,}\")\ndf_clean.head()"
   },
   {
     "objectID": "Tutorial.html#subsetting-by-county-or-year",
     "href": "Tutorial.html#subsetting-by-county-or-year",
     "title": "Tutorial: Accessing and Exploring the Data",
-    "section": "Subsetting by County or Year",
-    "text": "Subsetting by County or Year\n\n# Filter to a specific county\nsalt_lake = df_clean[df_clean[\"county_name\"] == \"Salt Lake\"]\nprint(salt_lake.shape)\n\n# Filter to a specific year\ndf_2023 = df_clean[df_clean[\"year\"] == 2023]\nprint(df_2023.shape)"
+    "section": "5. Subsetting by County or Year",
+    "text": "5. Subsetting by County or Year\nFilter to a specific county or a specific year for focused analysis:\nsalt_lake = df_clean[df_clean[\"county_name\"] == \"Salt Lake\"]\nprint(salt_lake.shape)\n\ndf_2023 = df_clean[df_clean[\"year\"] == 2023]\nprint(df_2023.shape)"
   },
   {
     "objectID": "Tutorial.html#basic-summary-statistics",
     "href": "Tutorial.html#basic-summary-statistics",
     "title": "Tutorial: Accessing and Exploring the Data",
-    "section": "Basic Summary Statistics",
-    "text": "Basic Summary Statistics\n\nsummary_cols = [OUTCOME] + COMPLEX_PREDICTORS\ndf_clean[summary_cols].describe().round(2)\n\n\nThe data is now ready for EDA and modeling (see the Technical Report)."
+    "section": "6. Basic Summary Statistics",
+    "text": "6. Basic Summary Statistics\nsummary_cols = [OUTCOME] + PREDICTORS\ndf_clean[summary_cols].describe().round(2)\n\nThe data is now ready for EDA and modeling. See the Technical Report for the full analysis, or run getting_started.ipynb to work through these steps yourself."
   },
   {
     "objectID": "index.html",
@@ -56,60 +56,18 @@
     "text": "This is a project website by Sujin Leek and Matthew Conger recording our work with US Census Data regarding Utah housing. We were curious as to what specific factors were affecting the decrease in affordability and availability of single-family homes in Utah.\nA streamlit app for seeing exploratory data analysis and plots can be found here.\nA link to the Github Repository for the Python package used to complete this analysis here.\nSee the package at pypi.org here.\nThis website includes a technical report, documentation, and a tutorial. Navigate using the tabs above."
   },
   {
-    "objectID": "data_acquisition.html",
-    "href": "data_acquisition.html",
-    "title": "Utah Housing Data Acquisition",
-    "section": "",
-    "text": "ACS 5-year estimates for Utah census tracts, 2009–2023.\nRun this notebook once to fetch the data and save it to data/utah_housing.csv. After that, the CSV can be reloaded directly without hitting the Census API again."
-  },
-  {
-    "objectID": "data_acquisition.html#setup",
-    "href": "data_acquisition.html#setup",
-    "title": "Utah Housing Data Acquisition",
-    "section": "1. Setup",
-    "text": "1. Setup\n\nimport os\nimport pandas as pd\nfrom utah_housing import fetch_all_years, OUTCOME, PREDICTORS\n\n\n---------------------------------------------------------------------------\nImportError                               Traceback (most recent call last)\nCell In[1], line 3\n      1 import os\n      2 import pandas as pd\n----&gt; 3 from utah_housing import fetch_all_years, OUTCOME, PREDICTORS\n\nImportError: cannot import name 'PREDICTORS' from 'utah_housing' (/home/sujin/stat386/Utah_Housing_Project/.venv/lib/python3.13/site-packages/utah_housing/__init__.py)"
-  },
-  {
-    "objectID": "data_acquisition.html#census-api-key",
-    "href": "data_acquisition.html#census-api-key",
-    "title": "Utah Housing Data Acquisition",
-    "section": "2. Census API Key",
-    "text": "2. Census API Key\nObtain a free key at: https://api.census.gov/data/key_signup.html\nSet it below, or store it in a .env file and load with python-dotenv.\n\n# TODO: Replace with your Census API key (do NOT commit this to git)\nos.environ[\"CENSUS_API_KEY\"] = \"your_census_api_key_here\""
-  },
-  {
-    "objectID": "data_acquisition.html#data-acquisition",
-    "href": "data_acquisition.html#data-acquisition",
-    "title": "Utah Housing Data Acquisition",
-    "section": "3. Data Acquisition",
-    "text": "3. Data Acquisition\nFetch ACS 5-year estimates for all Utah census tracts across 2009–2023.\n\ndf = fetch_all_years(years=range(2009, 2024))\nprint(f\"Total rows: {len(df):,}\")\ndf.head()"
-  },
-  {
-    "objectID": "data_acquisition.html#save-data",
-    "href": "data_acquisition.html#save-data",
-    "title": "Utah Housing Data Acquisition",
-    "section": "4. Save Data",
-    "text": "4. Save Data\n\nos.makedirs(\"data\", exist_ok=True)\ndf.to_csv(\"data/utah_housing.csv\", index=False)\nprint(\"Saved to data/utah_housing.csv\")"
-  },
-  {
-    "objectID": "data_acquisition.html#initial-exploration",
-    "href": "data_acquisition.html#initial-exploration",
-    "title": "Utah Housing Data Acquisition",
-    "section": "5. Initial Exploration",
-    "text": "5. Initial Exploration\n\ndf.head()\n\n\nprint(\"Shape:\", df.shape)\nprint(\"\\nOutcome variable:\", OUTCOME)\nprint(\"Predictors:\", PREDICTORS)\n\n\ndf.dtypes\n\n\ndf.describe()\n\n\n# Check missing values in key analysis columns\nanalysis_cols = [\"year\", \"GEOID\"] + [OUTCOME] + PREDICTORS\ndf[analysis_cols].isnull().sum()"
-  },
-  {
     "objectID": "Documentation.html",
     "href": "Documentation.html",
     "title": "Documentation",
     "section": "",
-    "text": "With this project, we hoped to answer the question: what factors are driving an decrease in single-family-home availability in Utah? We used US Census data, available through (census.gov)[census.gov] to facilitate our analysis."
+    "text": "With this project, we hoped to answer the question: what factors are driving an decrease in single-family-home availability in Utah? We used US Census data, available through census.gov to facilitate our analysis."
   },
   {
     "objectID": "Documentation.html#overview",
     "href": "Documentation.html#overview",
     "title": "Documentation",
     "section": "",
-    "text": "With this project, we hoped to answer the question: what factors are driving an decrease in single-family-home availability in Utah? We used US Census data, available through (census.gov)[census.gov] to facilitate our analysis."
+    "text": "With this project, we hoped to answer the question: what factors are driving an decrease in single-family-home availability in Utah? We used US Census data, available through census.gov to facilitate our analysis."
   },
   {
     "objectID": "Documentation.html#data-source",
@@ -123,14 +81,14 @@
     "href": "Documentation.html#key-variables",
     "title": "Documentation",
     "section": "Key Variables",
-    "text": "Key Variables\nNote that three of the five predictors are derived from other variables; while it seems counterintuitive to pull eight tables and only use five predictors, each table is necessary for the analysis.\n\nOutcome Variable\n\n\n\n\n\n\n\nVariable\nDescription\n\n\n\n\n[median_owner_costs_with_mortgage]\n[median monthly owner costs, with mortgage]\n\n\n\n\n\nPredictors\n\n\n\n\n\n\n\nVariable\nDescription\n\n\n\n\n[pct_sf_renter_occupied]\n[renter_single_family / single_family_units]\n\n\n[median_household_income]\n[Description]\n\n\n[owner_renter_income_gap]\n[median_income_owner_occupied - median_income_renter_occupied]\n\n\n[pct_vacant]\n[vacant_units / total_units_b25002]\n\n\n[pop_in_occupied_total]\n[Description]"
+    "text": "Key Variables\nNote that three of the five predictors are derived from other variables; while it seems counterintuitive to pull eight tables and only use five predictors, each table is necessary for the analysis.\n\nOutcome Variable\n\n\n\n\n\n\n\nVariable\nDescription\n\n\n\n\nmedian_owner_costs_with_mortgage\nMedian monthly owner costs for households with a mortgage\n\n\n\n\n\nPredictors\n\n\n\n\n\n\n\nVariable\nDescription\n\n\n\n\npct_sf_renter_occupied\nFraction of single-family homes that are renter-occupied (renter_single_family / single_family_units)\n\n\nmedian_household_income\nMedian household income in the past 12 months (inflation-adjusted)\n\n\nowner_renter_income_gap\nDifference in median income between owner- and renter-occupied households (median_income_owner_occupied - median_income_renter_occupied)\n\n\npct_vacant\nFraction of housing units that are vacant (vacant_units / total_units_b25002)\n\n\npop_in_occupied_total\nTotal population living in occupied housing units"
   },
   {
     "objectID": "Documentation.html#python-package-utah-housing",
     "href": "Documentation.html#python-package-utah-housing",
     "title": "Documentation",
     "section": "Python Package: utah-housing",
-    "text": "Python Package: utah-housing\nThe utah-housing package provides functions to fetch ACS data directly from the Census API and compute derived housing affordability metrics.\n\nInstallation\npip install utah-housing\n\nNote: A free Census API key is required. Obtain one at https://api.census.gov/data/key_signup.html and set it as an environment variable:\nexport CENSUS_API_KEY=\"your_key_here\"\n\n\n\nCore Functions\n\nfrom utah_housing import fetch_year, fetch_all_years, OUTCOME, PREDICTORS, run_model, run_diagnostics\n\n# Fetch ACS 5-year estimates for all years\ndf = fetch_all_years(years=range(2009, 2024))\n\n# Inspect variable groupings\nprint(\"Outcome:\", OUTCOME)\nprint(\"Predictors:\", PREDICTORS)\n\n\n\n\n\n\n\n\nFunction\nDescription\n\n\n\n\nfetch_year\nFetches ACS estimates for all Utah census tracts across the given year\n\n\nfetch_all_years(years)\nFetches ACS estimates for all Utah census tracts across the given year range\n\n\nOUTCOME\nString constant naming the outcome variable\n\n\nPREDICTORS\nList of extended predictor variable names\n\n\nrun_model\nBuilds fixed-effects model as described in technical report\n\n\nrun_diagnostics\nMakes sure VIFs and pairwise correlations are acceptable"
+    "text": "Python Package: utah-housing\nThe utah-housing package provides functions to fetch ACS data directly from the Census API and compute derived housing affordability metrics.\n\nInstallation\npip install utah-housing\n\nNote: A free Census API key is required. Obtain one at https://api.census.gov/data/key_signup.html and set it as an environment variable:\nexport CENSUS_API_KEY=\"your_key_here\"\n\n\n\nCore Functions\n\nfrom utah_housing import fetch_year, fetch_all_years, run_model, OUTCOME, PREDICTORS, ALL_VARS\n\n# Fetch ACS 5-year estimates for all years\ndf = fetch_all_years(years=range(2009, 2024))\n\n# Inspect variable groupings\nprint(\"Outcome:\", OUTCOME)\nprint(\"Predictors:\", PREDICTORS)\n\n\n\n\n\n\n\n\nFunction / Constant\nDescription\n\n\n\n\nfetch_year(year)\nFetches ACS 5-year estimates for all Utah census tracts for a single year\n\n\nfetch_all_years(years)\nFetches ACS estimates for all Utah census tracts across a range of years\n\n\nrun_model(df)\nRuns the two-way fixed effects model (tract FE + county×year FE); returns (result, coef_df)\n\n\nOUTCOME\nString constant: \"median_owner_costs_with_mortgage\"\n\n\nPREDICTORS\nList of the five predictor variable names used in the model\n\n\nALL_VARS\nFull list of raw ACS variable codes pulled from the Census API"
   },
   {
     "objectID": "Documentation.html#license",
@@ -138,6 +96,48 @@
     "title": "Documentation",
     "section": "License",
     "text": "License\nCopyright (c) 2018 The Python Packaging Authority\nPermission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\nThe above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\nTHE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\nMIT 2025"
+  },
+  {
+    "objectID": "getting_started.html",
+    "href": "getting_started.html",
+    "title": "Getting Started with the Utah Housing Dataset",
+    "section": "",
+    "text": "ACS 5-year estimates for Utah census tracts, 2009–2023.\nRun this notebook to fetch the data, save it locally, and do an initial exploration. After saving to data/utah_housing.csv, you can reload the CSV directly without calling the Census API again.\nFor a full written walkthrough of each step, see the Tutorial page on the project website."
+  },
+  {
+    "objectID": "getting_started.html#setup",
+    "href": "getting_started.html#setup",
+    "title": "Getting Started with the Utah Housing Dataset",
+    "section": "1. Setup",
+    "text": "1. Setup\n\nimport os\nimport pandas as pd\nfrom utah_housing import fetch_all_years, OUTCOME, PREDICTORS"
+  },
+  {
+    "objectID": "getting_started.html#census-api-key",
+    "href": "getting_started.html#census-api-key",
+    "title": "Getting Started with the Utah Housing Dataset",
+    "section": "2. Census API Key",
+    "text": "2. Census API Key\nObtain a free key at: https://api.census.gov/data/key_signup.html\nSet it below, or store it in a .env file and load with python-dotenv.\n\n# TODO: Replace with your Census API key (do NOT commit this to git)\nos.environ[\"CENSUS_API_KEY\"] = \"your_census_api_key_here\""
+  },
+  {
+    "objectID": "getting_started.html#data-acquisition",
+    "href": "getting_started.html#data-acquisition",
+    "title": "Getting Started with the Utah Housing Dataset",
+    "section": "3. Data Acquisition",
+    "text": "3. Data Acquisition\nFetch ACS 5-year estimates for all Utah census tracts across 2009–2023.\n\ndf = fetch_all_years(years=range(2009, 2024))\nprint(f\"Total rows: {len(df):,}\")\ndf.head()"
+  },
+  {
+    "objectID": "getting_started.html#save-data",
+    "href": "getting_started.html#save-data",
+    "title": "Getting Started with the Utah Housing Dataset",
+    "section": "4. Save Data",
+    "text": "4. Save Data\n\nos.makedirs(\"data\", exist_ok=True)\ndf.to_csv(\"data/utah_housing.csv\", index=False)\nprint(\"Saved to data/utah_housing.csv\")"
+  },
+  {
+    "objectID": "getting_started.html#initial-exploration",
+    "href": "getting_started.html#initial-exploration",
+    "title": "Getting Started with the Utah Housing Dataset",
+    "section": "5. Initial Exploration",
+    "text": "5. Initial Exploration\n\ndf.head()\n\n\nprint(\"Shape:\", df.shape)\nprint(\"\\nOutcome variable:\", OUTCOME)\nprint(\"Predictors:\", PREDICTORS)\n\n\ndf.dtypes\n\n\ndf.describe()\n\n\n# Check missing values in key analysis columns\nanalysis_cols = [\"year\", \"GEOID\"] + [OUTCOME] + PREDICTORS\ndf[analysis_cols].isnull().sum()"
   },
   {
     "objectID": "TechnicalReport.html",

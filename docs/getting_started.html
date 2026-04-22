@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Utah Housing Data Acquisition – Utah Housing Affordability — STAT 386</title>
+<title>Getting Started with the Utah Housing Dataset – Utah Housing Affordability — STAT 386</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -170,7 +170,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Utah Housing Data Acquisition</h1>
+<h1 class="title">Getting Started with the Utah Housing Dataset</h1>
 </div>
 
 
@@ -188,25 +188,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>ACS 5-year estimates for Utah census tracts, 2009–2023.</p>
-<p>Run this notebook once to fetch the data and save it to <code>data/utah_housing.csv</code>. After that, the CSV can be reloaded directly without hitting the Census API again.</p>
+<p>Run this notebook to fetch the data, save it locally, and do an initial exploration. After saving to <code>data/utah_housing.csv</code>, you can reload the CSV directly without calling the Census API again.</p>
+<p>For a full written walkthrough of each step, see the <a href="https://congerm.github.io/Utah_Housing_Project/Tutorial.html">Tutorial page</a> on the project website.</p>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">1. Setup</h2>
-<div id="cell-3" class="cell" data-execution_count="1">
+<div id="cell-3" class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> utah_housing <span class="im">import</span> fetch_all_years, OUTCOME, PREDICTORS</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-error">
-<div class="ansi-escaped-output">
-<pre><span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">ImportError</span>                               Traceback (most recent call last)
-<span class="ansi-cyan-fg">Cell</span><span class="ansi-cyan-fg"> </span><span class="ansi-green-fg">In[1]</span><span class="ansi-green-fg">, line 3</span>
-<span class="ansi-green-fg">      1</span> <span style="font-weight:bold;color:rgb(0,135,0)">import</span> os
-<span class="ansi-green-fg">      2</span> <span style="font-weight:bold;color:rgb(0,135,0)">import</span> pandas <span style="font-weight:bold;color:rgb(0,135,0)">as</span> pd
-<span class="ansi-green-fg">----&gt; </span><span class="ansi-green-fg">3</span> <span style="font-weight:bold;color:rgb(0,135,0)">from</span> utah_housing <span style="font-weight:bold;color:rgb(0,135,0)">import</span> fetch_all_years, OUTCOME, PREDICTORS
-
-<span class="ansi-red-fg">ImportError</span>: cannot import name 'PREDICTORS' from 'utah_housing' (/home/sujin/stat386/Utah_Housing_Project/.venv/lib/python3.13/site-packages/utah_housing/__init__.py)</pre>
-</div>
-</div>
 </div>
 </section>
 <section id="census-api-key" class="level2">
