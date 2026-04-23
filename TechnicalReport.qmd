@@ -36,9 +36,11 @@ We decided to pull these eight tables, at a granularity of each census tract, ea
 
 ## Model Selection and Validation ##
 
-We built a two-way fixed effects (or fixed panel) regression model to identify within-tract drivers of ownership costs. We initially wanted to use a simple multiple linear regression model, but found that we were explaining almost none of the variance in our data. A fixed effects model helps to remedy the inevitable unknown elements of variance in such an economic model, as it holds certain elements constant to account for inherent variance. 
+We built a two-way fixed effects (or fixed panel) regression model to identify within-tract drivers of ownership costs. 
 
-Our model controls for tract-level fixed effects, meaning time-invariant characteristics of a neighborhood like location and county $\times$ year fixed effects, which account for unknown variables like employer expansion and COVID-era impacts. Our model also excludes the years 2009-2013 to account for the economic recovery following the 2008 recession.
+We initially wanted to use a simple multiple linear regression model, but found that we were explaining almost none of the variance in our data. The poor performance of the simple model is likely due to omitted variable bias from unobserved, time-invariant tract characteristics like general desirability and proximity to jobs. A fixed effects model helps to remedy the inevitable unknown elements of variance in such an economic model, as it holds certain elements constant to account for inherent variance. 
+
+Our model controls for tract-level fixed effects, meaning time-invariant characteristics of a neighborhood like location and county $\times$ year fixed effects, which account for unknown variables like employer expansion and COVID-era impacts. Our model also excludes the years 2009-2013 to account for the economic recovery following the 2008 recession. The model assumes that housing costs within a tract would follow the same trend as other tracts in the same county and year. 
 
 The model is as follows: 
 
@@ -48,6 +50,8 @@ $$
 
 where $i =$ tract (Census GEOID), $t =$ year, and $c(i) =$ county of tract $i$.
 
+Because tract fixed effects remove all time-invariant differences across tracts and county $\times$ year effects remove shocks common to a county in a given year, the coefficients $\beta$ are identified from within-tract deviations over time relative to other tracts in the same county and the same year. For example, the coefficient on median household income reflects how changes in income within a tract over time, compared to other tracts in the same county and year, are associated with changes in owner costs. 
+
 $\alpha_i$ stands for tract fixed effect, which controls for anything constant within a tract over time, like location desirability, zoning baseline, and neighborhood quality. In other words, $\alpha$ lets us compare a tract to itself over time. This means that all estimates are identified using within-tract changes over time and not differences between tracts. 
 
 $\lambda_{c(i), t}$ stands for the county $\times$ year fixed effect, controlling for anything affecting a county in a specific year; things like local economic shocks (ex: big employer entering or leaving), policy changes, or impacts from COVID. In other words, $\lambda_{c(i), t}$ allows us to remove shared shocks across nearby areas at the same time.
@@ -56,7 +60,7 @@ $\lambda_{c(i), t}$ stands for the county $\times$ year fixed effect, controllin
 
 Our model is implemented in Python and uses features of the statsmodels package as well as the linearmodels package. 
 
-We first filter the dataset to relevant variables, these being tract, county, year, monthly owner costs for households with a mortgage, percent of single-family homes that are renter-occupied, median household income, owner-renter income gap, percent of vacant single-family homes, and total population in tract. Note that we need each census tract to appear in at least two time periods to ensure we can identify the within-tract variation. 
+We first filter the dataset to relevant variables, these being tract, county, year, monthly owner costs for households with a mortgage, percent of single-family homes that are renter-occupied, median household income, owner-renter income gap, percent of vacant single-family homes, and total population in tract. Median household income captures general purchasing power across tracts, while population and vacancy rates capture demand. Note that we need each census tract to appear in at least two time periods to ensure we can identify the within-tract variation. 
 
 We next construct the regression design matrix. Fixed effects are incorporated using an absorbing approach rather than explicit dummy variables, which allows us to easily scale to thousands of tracts and county-year combinations. Two sets of fixed effects are included: tract fixed effects and county $\times$ year fixed effects, which are constructed by interacting county and year into a single categorical variable. These absorbing effects are passed to the AbsorbingLS model as categorical variables, allowing the estimator to partial them out efficiently during estimation. The model is fit using clustered standard errors at the tract level. 
 
@@ -112,13 +116,15 @@ A table depicting the results of the fixed panel model is below.
 **Observations:** 8,284  
 **Absorbed R²:** 0.9455
 
-The complexity of this model leads to a lot of things to consider. For example, while "Absorbed $R^2$" is impressively high, the county $\times$ year fixed effect will by nature increase the $R^2$ metric. So, we need to use other, more subjective metrics to judge the validity of our model. We found after fitting two different models (the first being a one-way fixed effects model) that main variables were more stable in our current model. Additionally, although not individually statistically significant, the other variables remain part of the joint explanatory structure of the model and contribute to overall fit.
+We see that a $10,000 increase in median household income within a tract is associated with an approximately $18 increase in monthly owner costs when holding tract, and county $\times$ year effects constant. Similarly, a $10,000 increase in the owner-renter income gap is associated with an approximately $6 increase in monthly owner costs. 
 
-In particular, the coefficients on median household income and the owner-renter income gap remained consistent in both magnitude and statistical significance, suggesting that these relationships are not driven by broader county-level shocks. Overall, this stability across model specifications provides evidence that our results are not sensitive to unobserved, time-varying county-level factors, and supports the use of the more complex model as a credible framework for identifying within-tract drivers of housing costs.
+The complexity of this model leads to a lot of things to consider. For example, while "Absorbed $R^2$" is impressively high, the county $\times$ year fixed effect will by nature increase the $R^2$ metric. So, we need to rely on coefficient stability and statistical significance rather than the $R^2$. We found after fitting two different models (the first being a one-way fixed effects model) that main variables were more stable in our current model. Additionally, although not individually statistically significant, the other variables remain part of the joint explanatory structure of the model and contribute to overall fit.
+
+In particular, the coefficients on median household income and the owner-renter income gap remained consistent in both magnitude and statistical significance, suggesting that these relationships are not driven by broader county-level shocks. Overall, this stability across model specifications provides evidence that our results are not sensitive to unobserved, time-varying county-level factors, and supports the use of the more complex model as a framework for identifying within-tract drivers of housing costs.
 
 ## Conclusions ##
  
-We were successfully able to establish that significant contributors to the rise in house prices in Utah are median household income, the owner-renter income gap, and population growth, answering our original question of what factors are leading to a difficulty in purchasing homes in recent years. 
+We were successfully able to establish that variables strongly associated with the rise in house prices in Utah within tracts over time are median household income, the owner-renter income gap, and population growth, answering our original question of what factors are leading to a difficulty in purchasing homes in recent years. It should be noted that these estimates are really of association and not causation. 
 
 While there are still many questions we would like to explore, like "how do zoning laws affect house prices?" and "is it really less profitable to build less expensive homes?", we consider this project a success. 
 

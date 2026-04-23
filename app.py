@@ -14,12 +14,9 @@ st.set_page_config(page_title="Utah Housing Affordability Explorer", layout="wid
 st.title("Utah Housing Affordability Explorer")
 st.markdown(
     """
-    ACS 5-year estimates for Utah census tracts, 2009–2023.
+    A user-guided exploration of American Community Survey estimates for Utah census tracts, 2009–2023.
 
     Use the sidebar to filter by year range and county, then explore trends, maps, and statistics.
-
-    The CSV is loaded from `data/utah_housing.csv`. Run `getting_started.ipynb` first if
-    the file does not exist.
     """
 )
 
