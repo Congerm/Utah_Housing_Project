@@ -6,19 +6,17 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
-from utah_housing import OUTCOME, COMPLEX_PREDICTORS
+# from utah_housing import OUTCOME, PREDICTORS 
+from utah_housing_package.utah_housing import OUTCOME, PREDICTORS
 
 st.set_page_config(page_title="Utah Housing Affordability Explorer", layout="wide")
 
 st.title("Utah Housing Affordability Explorer")
 st.markdown(
     """
-    ACS 5-year estimates for Utah census tracts, 2009–2023.
+    A user-guided exploration of American Community Survey estimates for Utah census tracts, 2009–2023.
 
     Use the sidebar to filter by year range and county, then explore trends, maps, and statistics.
-
-    The CSV is loaded from `data/utah_housing.csv`. Run `getting_started.ipynb` first if
-    the file does not exist.
     """
 )
 

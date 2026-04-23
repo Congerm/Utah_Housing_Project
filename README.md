@@ -65,7 +65,7 @@ df_2022 = fetch_year(2022)
 ### Run diagnostics
 
 ```python
-from utah_housing.fixed_effect_model import run_diagnostics
+from utah_housing.fixed_effects_model import run_diagnostics
 from utah_housing import PREDICTORS
 
 run_diagnostics(df, PREDICTORS)
