@@ -120,6 +120,26 @@ summary_cols = [OUTCOME] + PREDICTORS
 df_clean[summary_cols].describe().round(2)
 ```
 
+### Run diagnostics
+
+```python
+from utah_housing.fixed_effects_model import run_diagnostics
+
+run_diagnostics(df, PREDICTORS)
+```
+
+### Run models
+
+```python
+import pandas as pd
+from utah_housing import run_model
+
+df = pd.read_csv("utah_housing_2009_2023.csv")
+
+results, coefs = run_model(df)
+coefs.to_csv("results.csv")
+```
+
 ---
 
 The data is now ready for EDA and modeling. See the [Technical Report](TechnicalReport.qmd) for the full analysis, or run [getting_started.ipynb](getting_started.ipynb) to work through these steps yourself.

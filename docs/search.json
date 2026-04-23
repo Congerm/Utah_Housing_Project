@@ -46,7 +46,7 @@
     "href": "Tutorial.html#basic-summary-statistics",
     "title": "Tutorial: Accessing and Exploring the Data",
     "section": "6. Basic Summary Statistics",
-    "text": "6. Basic Summary Statistics\nsummary_cols = [OUTCOME] + PREDICTORS\ndf_clean[summary_cols].describe().round(2)\n\nThe data is now ready for EDA and modeling. See the Technical Report for the full analysis, or run getting_started.ipynb to work through these steps yourself."
+    "text": "6. Basic Summary Statistics\nsummary_cols = [OUTCOME] + PREDICTORS\ndf_clean[summary_cols].describe().round(2)\n\nRun diagnostics\nfrom utah_housing.fixed_effects_model import run_diagnostics\n\nrun_diagnostics(df, PREDICTORS)\n\n\nRun models\nimport pandas as pd\nfrom utah_housing import run_model\n\ndf = pd.read_csv(\"utah_housing_2009_2023.csv\")\n\nresults, coefs = run_model(df)\ncoefs.to_csv(\"results.csv\")\n\nThe data is now ready for EDA and modeling. See the Technical Report for the full analysis, or run getting_started.ipynb to work through these steps yourself."
   },
   {
     "objectID": "index.html",
