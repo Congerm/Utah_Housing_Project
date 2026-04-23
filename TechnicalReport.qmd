@@ -5,7 +5,7 @@ title: "Technical Report"
 ## Abstract ##
   
 
-A prominent topic over the past decade has been the continued rise in prices of single-family homes in America. Prices of housing contribute to wealth inequality and perpetuate barriers to family formation and upward mobility, which negatively affect many crises that the United States of America currently faces. Our hope with this project was to gain some empirical insight into why housing has become less accessible for young Americans in recent years. Using a fixed-panel regression model, we were able to isolate household income and owner-renter income gap as the two strongest predictors of rising ownership costs. 
+A prominent topic over the past decade has been the continued rise in prices of single-family homes in America. Prices of housing contribute to wealth inequality and perpetuate barriers to family formation and upward mobility, which negatively affect many crises that the United States of America currently faces. Our hope with this project was to gain some empirical insight into why housing has become less accessible for young Americans in recent years. Using a fixed-panel regression model, we find that within-tract increases in median household income and the owner–renter income gap are the predictor variables most strongly associated with rising ownership costs.
 
 
 ## Introduction ##
@@ -13,6 +13,8 @@ A prominent topic over the past decade has been the continued rise in prices of 
 Over the past decade, a prominent social and economic issue has been the lack of accessibility to housing. The notion of the American Dream suggests that all citizens should be afforded the privilege of owning a house provided they work hard and manage money accordingly, but in recent years, this dream has become less realistic for many Americans. 
 
 While it would have been ideal to look into single-family home purchase accessibility for the entirety of the United States of America, given the constraints we were working with, we decided to focus on data from Utah, found through the US Census. 
+
+The primary goal of this analysis is to identify which tract-level factors are most strongly associated with changes in monthly owner costs over time in Utah.
 
 ## Data Acquisition and Wrangling ##
 
@@ -60,7 +62,11 @@ $\lambda_{c(i), t}$ stands for the county $\times$ year fixed effect, controllin
 
 Our model is implemented in Python and uses features of the statsmodels package as well as the linearmodels package. 
 
-We first filter the dataset to relevant variables, these being tract, county, year, monthly owner costs for households with a mortgage, percent of single-family homes that are renter-occupied, median household income, owner-renter income gap, percent of vacant single-family homes, and total population in tract. Median household income captures general purchasing power across tracts, while population and vacancy rates capture demand. Note that we need each census tract to appear in at least two time periods to ensure we can identify the within-tract variation. 
+We first filter the dataset to relevant variables, these being tract, county, year, monthly owner costs for households with a mortgage, percent of single-family homes that are renter-occupied, median household income, owner-renter income gap, percent of vacant single-family homes, and total population in tract. 
+
+The owner–renter income gap is defined as the difference between median owner household income and median renter household income within a tract-year, and percentage variables are computed as proportions of relevant housing unit counts within each tract. Median household income captures general purchasing power across tracts, while population and vacancy rates capture demand. 
+
+Note that we need each census tract to appear in at least two time periods to ensure we can identify the within-tract variation. 
 
 We next construct the regression design matrix. Fixed effects are incorporated using an absorbing approach rather than explicit dummy variables, which allows us to easily scale to thousands of tracts and county-year combinations. Two sets of fixed effects are included: tract fixed effects and county $\times$ year fixed effects, which are constructed by interacting county and year into a single categorical variable. These absorbing effects are passed to the AbsorbingLS model as categorical variables, allowing the estimator to partial them out efficiently during estimation. The model is fit using clustered standard errors at the tract level. 
 
@@ -101,6 +107,12 @@ result = model.fit(cov_type="clustered", clusters=pd.Categorical(clean["GEOID"])
 
 ## Analyses, Results, and Interpretation ##
 
+### Key findings
+
+- Median household income and the owner-renter income gap are the strongest predictors of increases in owner costs. 
+
+- Other variables like vacancy and the percentage of single-family homes that are renter-occupied are not statistically significant after the including of fixed effects. 
+
 A table depicting the results of the fixed panel model is below. 
 
 ### Fixed Effects Model (Tract FE + County×Year FE)
@@ -122,11 +134,13 @@ The complexity of this model leads to a lot of things to consider. For example, 
 
 In particular, the coefficients on median household income and the owner-renter income gap remained consistent in both magnitude and statistical significance, suggesting that these relationships are not driven by broader county-level shocks. Overall, this stability across model specifications provides evidence that our results are not sensitive to unobserved, time-varying county-level factors, and supports the use of the more complex model as a framework for identifying within-tract drivers of housing costs.
 
+These findings directly address our research goal by identifying which tract-level changes are most strongly associated with rising ownership costs over time.
+
 ## Conclusions ##
  
 We were successfully able to establish that variables strongly associated with the rise in house prices in Utah within tracts over time are median household income, the owner-renter income gap, and population growth, answering our original question of what factors are leading to a difficulty in purchasing homes in recent years. It should be noted that these estimates are really of association and not causation. 
 
-While there are still many questions we would like to explore, like "how do zoning laws affect house prices?" and "is it really less profitable to build less expensive homes?", we consider this project a success. 
+While there are still many questions we would like to explore, like "how do zoning laws affect house prices?" and "is it really less profitable to build less expensive homes?", we consider this analysis to provide useful insight into the drivers of housing costs. 
 
 
 
