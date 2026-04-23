@@ -6,7 +6,7 @@ execute:
 
 ## **Overview**
 
-With this project, we hoped to answer the question: what factors are driving an decrease in single-family-home availability in Utah? We used US Census data, available through [census.gov](https://census.gov) to facilitate our analysis. 
+With this project, we hoped to answer the question: what factors are driving an decrease in single-family-home availability in Utah? We used US Census data, available through (census.gov)[census.gov] to facilitate our analysis. 
 
 ---
 
@@ -35,17 +35,18 @@ Note that three of the five predictors are derived from other variables; while i
 
 | Variable | Description |
 |----------|-------------|
-| `median_owner_costs_with_mortgage` | Median monthly owner costs for households with a mortgage |
+| `[median_owner_costs_with_mortgage]` | [median monthly owner costs, with mortgage] |
+ 
 
 ### Predictors
 
 | Variable | Description |
 |----------|-------------|
-| `pct_sf_renter_occupied` | Fraction of single-family homes that are renter-occupied (`renter_single_family / single_family_units`) |
-| `median_household_income` | Median household income in the past 12 months (inflation-adjusted) |
-| `owner_renter_income_gap` | Difference in median income between owner- and renter-occupied households (`median_income_owner_occupied - median_income_renter_occupied`) |
-| `pct_vacant` | Fraction of housing units that are vacant (`vacant_units / total_units_b25002`) |
-| `pop_in_occupied_total` | Total population living in occupied housing units |
+| `[pct_sf_renter_occupied]` | [renter_single_family / single_family_units] |
+| `[median_household_income]` | [Description] |
+| `[owner_renter_income_gap]` | [median_income_owner_occupied - median_income_renter_occupied] |
+| `[pct_vacant]` | [vacant_units / total_units_b25002] |
+| `[pop_in_occupied_total]` | [Description] |
 
 ---
 
@@ -72,23 +73,25 @@ pip install utah-housing
 
 ```{python}
 #| eval: false
-from utah_housing import fetch_year, fetch_all_years, OUTCOME, COMPLEX_PREDICTORS
+
+from utah_housing import fetch_year, fetch_all_years, OUTCOME, PREDICTORS, run_model, run_diagnostics
 
 # Fetch ACS 5-year estimates for all years
 df = fetch_all_years(years=range(2009, 2024))
 
 # Inspect variable groupings
 print("Outcome:", OUTCOME)
-print("Predictors:", COMPLEX_PREDICTORS)
+print("Predictors:", PREDICTORS)
 ```
 
-| Function / Constant | Description |
-|---------------------|--------------|
-| `fetch_year(year)` | Fetches ACS 5-year estimates for all Utah census tracts for a single year |
-| `fetch_all_years(years)` | Fetches ACS estimates for all Utah census tracts across a range of years |
-| `OUTCOME` | String constant: `"median_owner_costs_with_mortgage"` |
-| `BASE_PREDICTORS` | List of the four base predictor variable names |
-| `COMPLEX_PREDICTORS` | List of all five predictor variable names used in the model | 
+| Function | Description |
+|----------|-------------|
+| `fetch_year` | Fetches ACS estimates for all Utah census tracts across the given year |
+| `fetch_all_years(years)` | Fetches ACS estimates for all Utah census tracts across the given year range |
+| `OUTCOME` | String constant naming the outcome variable |
+| `PREDICTORS` | List of extended predictor variable names |
+| `run_model` | Builds fixed-effects model as described in technical report | 
+| `run_diagnostics` | Makes sure VIFs and pairwise correlations are acceptable | 
 
 ---
 

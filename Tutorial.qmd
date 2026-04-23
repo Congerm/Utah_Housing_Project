@@ -21,31 +21,17 @@ import os
 os.environ["CENSUS_API_KEY"] = "your_census_api_key_here"
 ```
 
+> **Tip:** Never commit your API key to git. Consider storing it in a `.env` file and loading it with `python-dotenv`.
+
 ---
 
 ## 2. Fetching the Data
 
 The `fetch_all_years` function pulls ACS 5-year estimates for all Utah census tracts across the years you specify. This calls the Census API once per year, so it may take a minute or two.
 
-```{python}
-#| include: false
-import os
-import pandas as pd
-from utah_housing import OUTCOME, COMPLEX_PREDICTORS
-
-CSV_PATH = "data/utah_housing.csv"
-
-if os.path.exists(CSV_PATH):
-    df = pd.read_csv(CSV_PATH)
-else:
-    from utah_housing import fetch_all_years
-    df = fetch_all_years(years=range(2009, 2024))
-    os.makedirs("data", exist_ok=True)
-    df.to_csv(CSV_PATH, index=False)
-```
-
 ```python
-from utah_housing import fetch_all_years
+import pandas as pd
+from utah_housing import fetch_all_years, OUTCOME, PREDICTORS
 
 df = fetch_all_years(years=range(2009, 2024))
 print(f"Total rows: {len(df):,}")
@@ -55,6 +41,7 @@ df.head()
 Once fetched, save the result to CSV so you don't need to hit the API again:
 
 ```python
+import os
 os.makedirs("data", exist_ok=True)
 df.to_csv("data/utah_housing.csv", index=False)
 print("Saved to data/utah_housing.csv")
@@ -72,27 +59,27 @@ df = pd.read_csv("data/utah_housing.csv")
 
 Get a quick sense of the dataset's shape and the variable groupings provided by the package:
 
-```{python}
+```python
 print("Shape:", df.shape)
 print("\nOutcome variable:", OUTCOME)
-print("Predictors:", COMPLEX_PREDICTORS)
+print("Predictors:", PREDICTORS)
 ```
 
 Check column types and look for missing values in the key analysis columns:
 
-```{python}
+```python
 df.dtypes
 ```
 
-```{python}
-analysis_cols = ["year", "GEOID"] + [OUTCOME] + COMPLEX_PREDICTORS
+```python
+analysis_cols = ["year", "GEOID"] + [OUTCOME] + PREDICTORS
 df[analysis_cols].isnull().sum()
 ```
 
 Get a statistical summary of the full dataset:
 
-```{python}
-df.describe().round(2)
+```python
+df.describe()
 ```
 
 ---
@@ -101,7 +88,7 @@ df.describe().round(2)
 
 The package returns fairly clean data, but you may want to drop rows missing the outcome variable and extract a readable county name for easier filtering:
 
-```{python}
+```python
 df_clean = df.dropna(subset=[OUTCOME]).copy()
 
 df_clean["county_name"] = df_clean["NAME"].str.extract(r",\s*(.+?)\s+County", expand=False)
@@ -116,7 +103,7 @@ df_clean.head()
 
 Filter to a specific county or a specific year for focused analysis:
 
-```{python}
+```python
 salt_lake = df_clean[df_clean["county_name"] == "Salt Lake"]
 print(salt_lake.shape)
 
@@ -128,8 +115,8 @@ print(df_2023.shape)
 
 ## 6. Basic Summary Statistics
 
-```{python}
-summary_cols = [OUTCOME] + COMPLEX_PREDICTORS
+```python
+summary_cols = [OUTCOME] + PREDICTORS
 df_clean[summary_cols].describe().round(2)
 ```
 
