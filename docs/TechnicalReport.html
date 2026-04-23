@@ -193,6 +193,7 @@ window.Quarto = {
   <li><a href="#model-building" id="toc-model-building" class="nav-link" data-scroll-target="#model-building">Model Building</a></li>
   <li><a href="#analyses-results-and-interpretation" id="toc-analyses-results-and-interpretation" class="nav-link" data-scroll-target="#analyses-results-and-interpretation">Analyses, Results, and Interpretation</a>
   <ul class="collapse">
+  <li><a href="#key-findings" id="toc-key-findings" class="nav-link" data-scroll-target="#key-findings">Key findings</a></li>
   <li><a href="#fixed-effects-model-tract-fe-countyyear-fe" id="toc-fixed-effects-model-tract-fe-countyyear-fe" class="nav-link" data-scroll-target="#fixed-effects-model-tract-fe-countyyear-fe">Fixed Effects Model (Tract FE + County×Year FE)</a></li>
   </ul></li>
   <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">Conclusions</a></li>
@@ -223,12 +224,13 @@ window.Quarto = {
 
 <section id="abstract" class="level2">
 <h2 class="anchored" data-anchor-id="abstract">Abstract</h2>
-<p>A prominent topic over the past decade has been the continued rise in prices of single-family homes in America. Prices of housing contribute to wealth inequality and perpetuate barriers to family formation and upward mobility, which negatively affect many crises that the United States of America currently faces. Our hope with this project was to gain some empirical insight into why housing has become less accessible for young Americans in recent years. Using a fixed-panel regression model, we were able to isolate household income and owner-renter income gap as the two strongest predictors of rising ownership costs.</p>
+<p>A prominent topic over the past decade has been the continued rise in prices of single-family homes in America. Prices of housing contribute to wealth inequality and perpetuate barriers to family formation and upward mobility, which negatively affect many crises that the United States of America currently faces. Our hope with this project was to gain some empirical insight into why housing has become less accessible for young Americans in recent years. Using a fixed-panel regression model, we find that within-tract increases in median household income and the owner–renter income gap are the predictor variables most strongly associated with rising ownership costs.</p>
 </section>
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
 <p>Over the past decade, a prominent social and economic issue has been the lack of accessibility to housing. The notion of the American Dream suggests that all citizens should be afforded the privilege of owning a house provided they work hard and manage money accordingly, but in recent years, this dream has become less realistic for many Americans.</p>
 <p>While it would have been ideal to look into single-family home purchase accessibility for the entirety of the United States of America, given the constraints we were working with, we decided to focus on data from Utah, found through the US Census.</p>
+<p>The primary goal of this analysis is to identify which tract-level factors are most strongly associated with changes in monthly owner costs over time in Utah.</p>
 </section>
 <section id="data-acquisition-and-wrangling" class="level2">
 <h2 class="anchored" data-anchor-id="data-acquisition-and-wrangling">Data Acquisition and Wrangling</h2>
@@ -284,39 +286,43 @@ window.Quarto = {
 </section>
 <section id="model-selection-and-validation" class="level2">
 <h2 class="anchored" data-anchor-id="model-selection-and-validation">Model Selection and Validation</h2>
-<p>We built a two-way fixed effects (or fixed panel) regression model to identify within-tract drivers of ownership costs. We initially wanted to use a simple multiple linear regression model, but found that we were explaining almost none of the variance in our data. A fixed effects model helps to remedy the inevitable unknown elements of variance in such an economic model, as it holds certain elements constant to account for inherent variance.</p>
-<p>Our model controls for tract-level fixed effects, meaning time-invariant characteristics of a neighborhood like location and county <span class="math inline">\(\times\)</span> year fixed effects, which account for unknown variables like employer expansion and COVID-era impacts. Our model also excludes the years 2009-2013 to account for the economic recovery following the 2008 recession.</p>
+<p>We built a two-way fixed effects (or fixed panel) regression model to identify within-tract drivers of ownership costs.</p>
+<p>We initially wanted to use a simple multiple linear regression model, but found that we were explaining almost none of the variance in our data. The poor performance of the simple model is likely due to omitted variable bias from unobserved, time-invariant tract characteristics like general desirability and proximity to jobs. A fixed effects model helps to remedy the inevitable unknown elements of variance in such an economic model, as it holds certain elements constant to account for inherent variance.</p>
+<p>Our model controls for tract-level fixed effects, meaning time-invariant characteristics of a neighborhood like location and county <span class="math inline">\(\times\)</span> year fixed effects, which account for unknown variables like employer expansion and COVID-era impacts. Our model also excludes the years 2009-2013 to account for the economic recovery following the 2008 recession. The model assumes that housing costs within a tract would follow the same trend as other tracts in the same county and year.</p>
 <p>The model is as follows:</p>
 <p><span class="math display">\[
 y_{it} = \beta X_{it} + \alpha_i + \lambda_{c(i), t} + u_{i,t}
 \]</span></p>
 <p>where <span class="math inline">\(i =\)</span> tract (Census GEOID), <span class="math inline">\(t =\)</span> year, and <span class="math inline">\(c(i) =\)</span> county of tract <span class="math inline">\(i\)</span>.</p>
+<p>Because tract fixed effects remove all time-invariant differences across tracts and county <span class="math inline">\(\times\)</span> year effects remove shocks common to a county in a given year, the coefficients <span class="math inline">\(\beta\)</span> are identified from within-tract deviations over time relative to other tracts in the same county and the same year. For example, the coefficient on median household income reflects how changes in income within a tract over time, compared to other tracts in the same county and year, are associated with changes in owner costs.</p>
 <p><span class="math inline">\(\alpha_i\)</span> stands for tract fixed effect, which controls for anything constant within a tract over time, like location desirability, zoning baseline, and neighborhood quality. In other words, <span class="math inline">\(\alpha\)</span> lets us compare a tract to itself over time. This means that all estimates are identified using within-tract changes over time and not differences between tracts.</p>
 <p><span class="math inline">\(\lambda_{c(i), t}\)</span> stands for the county <span class="math inline">\(\times\)</span> year fixed effect, controlling for anything affecting a county in a specific year; things like local economic shocks (ex: big employer entering or leaving), policy changes, or impacts from COVID. In other words, <span class="math inline">\(\lambda_{c(i), t}\)</span> allows us to remove shared shocks across nearby areas at the same time.</p>
 </section>
 <section id="model-building" class="level2">
 <h2 class="anchored" data-anchor-id="model-building">Model Building</h2>
 <p>Our model is implemented in Python and uses features of the statsmodels package as well as the linearmodels package.</p>
-<p>We first filter the dataset to relevant variables, these being tract, county, year, monthly owner costs for households with a mortgage, percent of single-family homes that are renter-occupied, median household income, owner-renter income gap, percent of vacant single-family homes, and total population in tract. Note that we need each census tract to appear in at least two time periods to ensure we can identify the within-tract variation.</p>
+<p>We first filter the dataset to relevant variables, these being tract, county, year, monthly owner costs for households with a mortgage, percent of single-family homes that are renter-occupied, median household income, owner-renter income gap, percent of vacant single-family homes, and total population in tract.</p>
+<p>The owner–renter income gap is defined as the difference between median owner household income and median renter household income within a tract-year, and percentage variables are computed as proportions of relevant housing unit counts within each tract. Median household income captures general purchasing power across tracts, while population and vacancy rates capture demand.</p>
+<p>Note that we need each census tract to appear in at least two time periods to ensure we can identify the within-tract variation.</p>
 <p>We next construct the regression design matrix. Fixed effects are incorporated using an absorbing approach rather than explicit dummy variables, which allows us to easily scale to thousands of tracts and county-year combinations. Two sets of fixed effects are included: tract fixed effects and county <span class="math inline">\(\times\)</span> year fixed effects, which are constructed by interacting county and year into a single categorical variable. These absorbing effects are passed to the AbsorbingLS model as categorical variables, allowing the estimator to partial them out efficiently during estimation. The model is fit using clustered standard errors at the tract level.</p>
 <p>In short, the estimation procedure follows these steps:</p>
 <ol type="1">
 <li>Prepare and clean the dataset</li>
 </ol>
-<div id="b792a2ef" class="cell" data-execution_count="1">
+<div id="c2cc5186" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>clean <span class="op">=</span> _prepare(df, PREDICTORS)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>clean[<span class="st">"county_year"</span>] <span class="op">=</span> clean[<span class="st">"county"</span>].astype(<span class="bu">str</span>) <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> clean[<span class="st">"year"</span>].astype(<span class="bu">str</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ol start="2" type="1">
 <li>Construct predictor matrix <span class="math inline">\(X\)</span> and outcome <span class="math inline">\(y\)</span></li>
 </ol>
-<div id="2ffffc63" class="cell" data-execution_count="2">
+<div id="5483ac12" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(clean[PREDICTORS])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ol start="3" type="1">
 <li>Define absorbed fixed effects (tract and county-year)</li>
 </ol>
-<div id="e22f08e6" class="cell" data-execution_count="3">
+<div id="1f75e0ce" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>absorb <span class="op">=</span> pd.DataFrame({</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tract_fe"</span>:       pd.Categorical(clean[<span class="st">"GEOID"</span>]),</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"county_year_fe"</span>: pd.Categorical(clean[<span class="st">"county_year"</span>]),</span>
@@ -325,14 +331,21 @@ y_{it} = \beta X_{it} + \alpha_i + \lambda_{c(i), t} + u_{i,t}
 <ol start="4" type="1">
 <li>Estimate the model via AbsorbingLS and compute cluster-robust standard errors at the tract level</li>
 </ol>
-<div id="c57a5fd1" class="cell" data-execution_count="4">
+<div id="c180dd33" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AbsorbingLS(clean[OUTCOME], X, absorb<span class="op">=</span>absorb)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> model.fit(cov_type<span class="op">=</span><span class="st">"clustered"</span>, clusters<span class="op">=</span>pd.Categorical(clean[<span class="st">"GEOID"</span>]),)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="analyses-results-and-interpretation" class="level2">
 <h2 class="anchored" data-anchor-id="analyses-results-and-interpretation">Analyses, Results, and Interpretation</h2>
+<section id="key-findings" class="level3">
+<h3 class="anchored" data-anchor-id="key-findings">Key findings</h3>
+<ul>
+<li><p>Median household income and the owner-renter income gap are the strongest predictors of increases in owner costs.</p></li>
+<li><p>Other variables like vacancy and the percentage of single-family homes that are renter-occupied are not statistically significant after the including of fixed effects.</p></li>
+</ul>
 <p>A table depicting the results of the fixed panel model is below.</p>
+</section>
 <section id="fixed-effects-model-tract-fe-countyyear-fe" class="level3">
 <h3 class="anchored" data-anchor-id="fixed-effects-model-tract-fe-countyyear-fe">Fixed Effects Model (Tract FE + County×Year FE)</h3>
 <table class="caption-top table">
@@ -406,14 +419,16 @@ y_{it} = \beta X_{it} + \alpha_i + \lambda_{c(i), t} + u_{i,t}
 </table>
 <p><strong>Observations:</strong> 8,284<br>
 <strong>Absorbed R²:</strong> 0.9455</p>
-<p>The complexity of this model leads to a lot of things to consider. For example, while “Absorbed <span class="math inline">\(R^2\)</span>” is impressively high, the county <span class="math inline">\(\times\)</span> year fixed effect will by nature increase the <span class="math inline">\(R^2\)</span> metric. So, we need to use other, more subjective metrics to judge the validity of our model. We found after fitting two different models (the first being a one-way fixed effects model) that main variables were more stable in our current model. Additionally, although not individually statistically significant, the other variables remain part of the joint explanatory structure of the model and contribute to overall fit.</p>
-<p>In particular, the coefficients on median household income and the owner-renter income gap remained consistent in both magnitude and statistical significance, suggesting that these relationships are not driven by broader county-level shocks. Overall, this stability across model specifications provides evidence that our results are not sensitive to unobserved, time-varying county-level factors, and supports the use of the more complex model as a credible framework for identifying within-tract drivers of housing costs.</p>
+<p>We see that a $10,000 increase in median household income within a tract is associated with an approximately $18 increase in monthly owner costs when holding tract, and county <span class="math inline">\(\times\)</span> year effects constant. Similarly, a $10,000 increase in the owner-renter income gap is associated with an approximately $6 increase in monthly owner costs.</p>
+<p>The complexity of this model leads to a lot of things to consider. For example, while “Absorbed <span class="math inline">\(R^2\)</span>” is impressively high, the county <span class="math inline">\(\times\)</span> year fixed effect will by nature increase the <span class="math inline">\(R^2\)</span> metric. So, we need to rely on coefficient stability and statistical significance rather than the <span class="math inline">\(R^2\)</span>. We found after fitting two different models (the first being a one-way fixed effects model) that main variables were more stable in our current model. Additionally, although not individually statistically significant, the other variables remain part of the joint explanatory structure of the model and contribute to overall fit.</p>
+<p>In particular, the coefficients on median household income and the owner-renter income gap remained consistent in both magnitude and statistical significance, suggesting that these relationships are not driven by broader county-level shocks. Overall, this stability across model specifications provides evidence that our results are not sensitive to unobserved, time-varying county-level factors, and supports the use of the more complex model as a framework for identifying within-tract drivers of housing costs.</p>
+<p>These findings directly address our research goal by identifying which tract-level changes are most strongly associated with rising ownership costs over time.</p>
 </section>
 </section>
 <section id="conclusions" class="level2">
 <h2 class="anchored" data-anchor-id="conclusions">Conclusions</h2>
-<p>We were successfully able to establish that significant contributors to the rise in house prices in Utah are median household income, the owner-renter income gap, and population growth, answering our original question of what factors are leading to a difficulty in purchasing homes in recent years.</p>
-<p>While there are still many questions we would like to explore, like “how do zoning laws affect house prices?” and “is it really less profitable to build less expensive homes?”, we consider this project a success.</p>
+<p>We were successfully able to establish that variables strongly associated with the rise in house prices in Utah within tracts over time are median household income, the owner-renter income gap, and population growth, answering our original question of what factors are leading to a difficulty in purchasing homes in recent years. It should be noted that these estimates are really of association and not causation.</p>
+<p>While there are still many questions we would like to explore, like “how do zoning laws affect house prices?” and “is it really less profitable to build less expensive homes?”, we consider this analysis to provide useful insight into the drivers of housing costs.</p>
 
 
 <!-- -->
@@ -879,7 +894,7 @@ y_{it} = \beta X_{it} + \alpha_i + \lambda_{c(i), t} + u_{i,t}
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">## Abstract ##</span></span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  </span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>A prominent topic over the past decade has been the continued rise in prices of single-family homes in America. Prices of housing contribute to wealth inequality and perpetuate barriers to family formation and upward mobility, which negatively affect many crises that the United States of America currently faces. Our hope with this project was to gain some empirical insight into why housing has become less accessible for young Americans in recent years. Using a fixed-panel regression model, we were able to isolate household income and owner-renter income gap as the two strongest predictors of rising ownership costs. </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>A prominent topic over the past decade has been the continued rise in prices of single-family homes in America. Prices of housing contribute to wealth inequality and perpetuate barriers to family formation and upward mobility, which negatively affect many crises that the United States of America currently faces. Our hope with this project was to gain some empirical insight into why housing has become less accessible for young Americans in recent years. Using a fixed-panel regression model, we find that within-tract increases in median household income and the owner–renter income gap are the predictor variables most strongly associated with rising ownership costs.</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">## Introduction ##</span></span>
@@ -888,115 +903,135 @@ y_{it} = \beta X_{it} + \alpha_i + \lambda_{c(i), t} + u_{i,t}
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>While it would have been ideal to look into single-family home purchase accessibility for the entirety of the United States of America, given the constraints we were working with, we decided to focus on data from Utah, found through the US Census. </span>
 <span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data Acquisition and Wrangling ##</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>The primary goal of this analysis is to identify which tract-level factors are most strongly associated with changes in monthly owner costs over time in Utah.</span>
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>Data was obtained through the US Census Bureau's American Community Survey (2009-2023). We constructed a dataset spanning 772 census tracts across Utah, which includes 393 ZIP codes and 29 counties. </span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="fu">## Data Acquisition and Wrangling ##</span></span>
 <span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>When considering an outcome variable for this analysis, we picked monthly owner costs for households with a mortgage as an indicator of how much it costs a Utahan to purchase and live in a home. Predictor variables were chosen based on easily quantifiable measures, like numbers of units and average income, and measures available through the US Census American Community Survey. </span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>Data was obtained through the US Census Bureau's American Community Survey (2009-2023). We constructed a dataset spanning 772 census tracts across Utah, which includes 393 ZIP codes and 29 counties. </span>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>We decided to pull these eight tables, at a granularity of each census tract, each year, for years 2009-2023.</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>When considering an outcome variable for this analysis, we picked monthly owner costs for households with a mortgage as an indicator of how much it costs a Utahan to purchase and live in a home. Predictor variables were chosen based on easily quantifiable measures, like numbers of units and average income, and measures available through the US Census American Community Survey. </span>
 <span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Table <span class="pp">|</span> Details <span class="pp">|</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="pp">|----------|---------|</span></span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25024** <span class="pp">|</span> Units in Structure <span class="pp">|</span></span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25001** <span class="pp">|</span> Housing Units <span class="pp">|</span></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25003** <span class="pp">|</span> Tenure (Owner Occupied vs Renter Occupied) <span class="pp">|</span></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25008** <span class="pp">|</span> Total Population in Occupied Housing Units by Tenure <span class="pp">|</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25119** <span class="pp">|</span> Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) by Tenure <span class="pp">|</span></span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25032** <span class="pp">|</span> Tenure by Units in Structure <span class="pp">|</span></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25088** <span class="pp">|</span> Median Selected Monthly Owner Costs (Dollars) by Mortgage Status <span class="pp">|</span></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B19013** <span class="pp">|</span> Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) <span class="pp">|</span></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Selection and Validation ##</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>We decided to pull these eight tables, at a granularity of each census tract, each year, for years 2009-2023.</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Table <span class="pp">|</span> Details <span class="pp">|</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="pp">|----------|---------|</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25024** <span class="pp">|</span> Units in Structure <span class="pp">|</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25001** <span class="pp">|</span> Housing Units <span class="pp">|</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25003** <span class="pp">|</span> Tenure (Owner Occupied vs Renter Occupied) <span class="pp">|</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25008** <span class="pp">|</span> Total Population in Occupied Housing Units by Tenure <span class="pp">|</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25119** <span class="pp">|</span> Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) by Tenure <span class="pp">|</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25032** <span class="pp">|</span> Tenure by Units in Structure <span class="pp">|</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B25088** <span class="pp">|</span> Median Selected Monthly Owner Costs (Dollars) by Mortgage Status <span class="pp">|</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **B19013** <span class="pp">|</span> Median Household Income in the Past 12 Months (in 2024 Inflation-Adjusted Dollars) <span class="pp">|</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>We built a two-way fixed effects (or fixed panel) regression model to identify within-tract drivers of ownership costs. We initially wanted to use a simple multiple linear regression model, but found that we were explaining almost none of the variance in our data. A fixed effects model helps to remedy the inevitable unknown elements of variance in such an economic model, as it holds certain elements constant to account for inherent variance. </span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Selection and Validation ##</span></span>
 <span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>Our model controls for tract-level fixed effects, meaning time-invariant characteristics of a neighborhood like location and county $\times$ year fixed effects, which account for unknown variables like employer expansion and COVID-era impacts. Our model also excludes the years 2009-2013 to account for the economic recovery following the 2008 recession.</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>We built a two-way fixed effects (or fixed panel) regression model to identify within-tract drivers of ownership costs. </span>
 <span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>The model is as follows: </span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>We initially wanted to use a simple multiple linear regression model, but found that we were explaining almost none of the variance in our data. The poor performance of the simple model is likely due to omitted variable bias from unobserved, time-invariant tract characteristics like general desirability and proximity to jobs. A fixed effects model helps to remedy the inevitable unknown elements of variance in such an economic model, as it holds certain elements constant to account for inherent variance. </span>
 <span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>$$</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>y_{it} = \beta X_{it} + \alpha_i + \lambda_{c(i), t} + u_{i,t}</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>Our model controls for tract-level fixed effects, meaning time-invariant characteristics of a neighborhood like location and county $\times$ year fixed effects, which account for unknown variables like employer expansion and COVID-era impacts. Our model also excludes the years 2009-2013 to account for the economic recovery following the 2008 recession. The model assumes that housing costs within a tract would follow the same trend as other tracts in the same county and year. </span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>The model is as follows: </span>
 <span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>where $i =$ tract (Census GEOID), $t =$ year, and $c(i) =$ county of tract $i$.</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>$\alpha_i$ stands for tract fixed effect, which controls for anything constant within a tract over time, like location desirability, zoning baseline, and neighborhood quality. In other words, $\alpha$ lets us compare a tract to itself over time. This means that all estimates are identified using within-tract changes over time and not differences between tracts. </span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>y_{it} = \beta X_{it} + \alpha_i + \lambda_{c(i), t} + u_{i,t}</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>$$</span>
 <span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>$\lambda_{c(i), t}$ stands for the county $\times$ year fixed effect, controlling for anything affecting a county in a specific year; things like local economic shocks (ex: big employer entering or leaving), policy changes, or impacts from COVID. In other words, $\lambda_{c(i), t}$ allows us to remove shared shocks across nearby areas at the same time.</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>where $i =$ tract (Census GEOID), $t =$ year, and $c(i) =$ county of tract $i$.</span>
 <span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Building </span></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>Because tract fixed effects remove all time-invariant differences across tracts and county $\times$ year effects remove shocks common to a county in a given year, the coefficients $\beta$ are identified from within-tract deviations over time relative to other tracts in the same county and the same year. For example, the coefficient on median household income reflects how changes in income within a tract over time, compared to other tracts in the same county and year, are associated with changes in owner costs. </span>
 <span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>Our model is implemented in Python and uses features of the statsmodels package as well as the linearmodels package. </span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>$\alpha_i$ stands for tract fixed effect, which controls for anything constant within a tract over time, like location desirability, zoning baseline, and neighborhood quality. In other words, $\alpha$ lets us compare a tract to itself over time. This means that all estimates are identified using within-tract changes over time and not differences between tracts. </span>
 <span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>We first filter the dataset to relevant variables, these being tract, county, year, monthly owner costs for households with a mortgage, percent of single-family homes that are renter-occupied, median household income, owner-renter income gap, percent of vacant single-family homes, and total population in tract. Note that we need each census tract to appear in at least two time periods to ensure we can identify the within-tract variation. </span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>$\lambda_{c(i), t}$ stands for the county $\times$ year fixed effect, controlling for anything affecting a county in a specific year; things like local economic shocks (ex: big employer entering or leaving), policy changes, or impacts from COVID. In other words, $\lambda_{c(i), t}$ allows us to remove shared shocks across nearby areas at the same time.</span>
 <span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a>We next construct the regression design matrix. Fixed effects are incorporated using an absorbing approach rather than explicit dummy variables, which allows us to easily scale to thousands of tracts and county-year combinations. Two sets of fixed effects are included: tract fixed effects and county $\times$ year fixed effects, which are constructed by interacting county and year into a single categorical variable. These absorbing effects are passed to the AbsorbingLS model as categorical variables, allowing the estimator to partial them out efficiently during estimation. The model is fit using clustered standard errors at the tract level. </span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## Model Building </span></span>
 <span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>In short, the estimation procedure follows these steps: </span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>Our model is implemented in Python and uses features of the statsmodels package as well as the linearmodels package. </span>
 <span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Prepare and clean the dataset</span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>We first filter the dataset to relevant variables, these being tract, county, year, monthly owner costs for households with a mortgage, percent of single-family homes that are renter-occupied, median household income, owner-renter income gap, percent of vacant single-family homes, and total population in tract. </span>
 <span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>clean <span class="op">=</span> _prepare(df, PREDICTORS)</span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>clean[<span class="st">"county_year"</span>] <span class="op">=</span> clean[<span class="st">"county"</span>].astype(<span class="bu">str</span>) <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> clean[<span class="st">"year"</span>].astype(<span class="bu">str</span>)</span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>The owner–renter income gap is defined as the difference between median owner household income and median renter household income within a tract-year, and percentage variables are computed as proportions of relevant housing unit counts within each tract. Median household income captures general purchasing power across tracts, while population and vacancy rates capture demand. </span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>Note that we need each census tract to appear in at least two time periods to ensure we can identify the within-tract variation. </span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>We next construct the regression design matrix. Fixed effects are incorporated using an absorbing approach rather than explicit dummy variables, which allows us to easily scale to thousands of tracts and county-year combinations. Two sets of fixed effects are included: tract fixed effects and county $\times$ year fixed effects, which are constructed by interacting county and year into a single categorical variable. These absorbing effects are passed to the AbsorbingLS model as categorical variables, allowing the estimator to partial them out efficiently during estimation. The model is fit using clustered standard errors at the tract level. </span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>In short, the estimation procedure follows these steps: </span>
 <span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Construct predictor matrix $X$ and outcome $y$</span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Prepare and clean the dataset</span>
 <span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
 <span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(clean[PREDICTORS])</span>
-<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Define absorbed fixed effects (tract and county-year)</span>
-<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a>absorb <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tract_fe"</span>:       pd.Categorical(clean[<span class="st">"GEOID"</span>]),</span>
-<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a>    <span class="st">"county_year_fe"</span>: pd.Categorical(clean[<span class="st">"county_year"</span>]),</span>
-<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>clean <span class="op">=</span> _prepare(df, PREDICTORS)</span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a>clean[<span class="st">"county_year"</span>] <span class="op">=</span> clean[<span class="st">"county"</span>].astype(<span class="bu">str</span>) <span class="op">+</span> <span class="st">"_"</span> <span class="op">+</span> clean[<span class="st">"year"</span>].astype(<span class="bu">str</span>)</span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Construct predictor matrix $X$ and outcome $y$</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> sm.add_constant(clean[PREDICTORS])</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Define absorbed fixed effects (tract and county-year)</span>
 <span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Estimate the model via AbsorbingLS and compute cluster-robust standard errors at the tract level</span>
-<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AbsorbingLS(clean[OUTCOME], X, absorb<span class="op">=</span>absorb)</span>
-<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> model.fit(cov_type<span class="op">=</span><span class="st">"clustered"</span>, clusters<span class="op">=</span>pd.Categorical(clean[<span class="st">"GEOID"</span>]),)</span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a>absorb <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb5-101"><a href="#cb5-101" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tract_fe"</span>:       pd.Categorical(clean[<span class="st">"GEOID"</span>]),</span>
+<span id="cb5-102"><a href="#cb5-102" aria-hidden="true" tabindex="-1"></a>    <span class="st">"county_year_fe"</span>: pd.Categorical(clean[<span class="st">"county_year"</span>]),</span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a>})</span>
 <span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a><span class="fu">## Analyses, Results, and Interpretation ##</span></span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Estimate the model via AbsorbingLS and compute cluster-robust standard errors at the tract level</span>
 <span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a>A table depicting the results of the fixed panel model is below. </span>
-<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fixed Effects Model (Tract FE + County×Year FE)</span></span>
-<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Variable                     <span class="pp">|</span> Coef     <span class="pp">|</span> Std. Err. <span class="pp">|</span> t-stat <span class="pp">|</span> p-value <span class="pp">|</span> CI Low   <span class="pp">|</span> CI High  <span class="pp">|</span></span>
-<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a><span class="pp">|------------------------------|----------|-----------|--------|---------|----------|----------|</span></span>
-<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> pct_sf_renter_occupied       <span class="pp">|</span> -103.558 <span class="pp">|</span> 64.051    <span class="pp">|</span> -1.617 <span class="pp">|</span> 0.106   <span class="pp">|</span> -229.097 <span class="pp">|</span> 21.981   <span class="pp">|</span></span>
-<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> median_household_income      <span class="pp">|</span> 0.0018   <span class="pp">|</span> 0.0004    <span class="pp">|</span> 4.851  <span class="pp">|</span> 0.000   <span class="pp">|</span> 0.0011   <span class="pp">|</span> 0.0026   <span class="pp">|</span></span>
-<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> owner_renter_income_gap      <span class="pp">|</span> 0.0006   <span class="pp">|</span> 0.0002    <span class="pp">|</span> 3.925  <span class="pp">|</span> 0.000   <span class="pp">|</span> 0.0003   <span class="pp">|</span> 0.0009   <span class="pp">|</span></span>
-<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> pct_vacant                   <span class="pp">|</span> 31.207   <span class="pp">|</span> 72.176    <span class="pp">|</span> 0.432  <span class="pp">|</span> 0.666   <span class="pp">|</span> -110.258 <span class="pp">|</span> 172.673  <span class="pp">|</span></span>
-<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> pop_in_occupied_total        <span class="pp">|</span> 0.0088   <span class="pp">|</span> 0.0046    <span class="pp">|</span> 1.934  <span class="pp">|</span> 0.053   <span class="pp">|</span> -0.0001  <span class="pp">|</span> 0.0178   <span class="pp">|</span></span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AbsorbingLS(clean[OUTCOME], X, absorb<span class="op">=</span>absorb)</span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a>result <span class="op">=</span> model.fit(cov_type<span class="op">=</span><span class="st">"clustered"</span>, clusters<span class="op">=</span>pd.Categorical(clean[<span class="st">"GEOID"</span>]),)</span>
+<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a><span class="fu">## Analyses, Results, and Interpretation ##</span></span>
+<span id="cb5-117"><a href="#cb5-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-118"><a href="#cb5-118" aria-hidden="true" tabindex="-1"></a><span class="fu">### Key findings</span></span>
 <span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a>**Observations:** 8,284  </span>
-<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a>**Absorbed R²:** 0.9455</span>
-<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a>The complexity of this model leads to a lot of things to consider. For example, while "Absorbed $R^2$" is impressively high, the county $\times$ year fixed effect will by nature increase the $R^2$ metric. So, we need to use other, more subjective metrics to judge the validity of our model. We found after fitting two different models (the first being a one-way fixed effects model) that main variables were more stable in our current model. Additionally, although not individually statistically significant, the other variables remain part of the joint explanatory structure of the model and contribute to overall fit.</span>
-<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a>In particular, the coefficients on median household income and the owner-renter income gap remained consistent in both magnitude and statistical significance, suggesting that these relationships are not driven by broader county-level shocks. Overall, this stability across model specifications provides evidence that our results are not sensitive to unobserved, time-varying county-level factors, and supports the use of the more complex model as a credible framework for identifying within-tract drivers of housing costs.</span>
-<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conclusions ##</span></span>
-<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a> </span>
-<span id="cb5-129"><a href="#cb5-129" aria-hidden="true" tabindex="-1"></a>We were successfully able to establish that significant contributors to the rise in house prices in Utah are median household income, the owner-renter income gap, and population growth, answering our original question of what factors are leading to a difficulty in purchasing homes in recent years. </span>
-<span id="cb5-130"><a href="#cb5-130" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-131"><a href="#cb5-131" aria-hidden="true" tabindex="-1"></a>While there are still many questions we would like to explore, like "how do zoning laws affect house prices?" and "is it really less profitable to build less expensive homes?", we consider this project a success. </span>
-<span id="cb5-132"><a href="#cb5-132" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-133"><a href="#cb5-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Median household income and the owner-renter income gap are the strongest predictors of increases in owner costs. </span>
+<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Other variables like vacancy and the percentage of single-family homes that are renter-occupied are not statistically significant after the including of fixed effects. </span>
+<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a>A table depicting the results of the fixed panel model is below. </span>
+<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fixed Effects Model (Tract FE + County×Year FE)</span></span>
+<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Variable                     <span class="pp">|</span> Coef     <span class="pp">|</span> Std. Err. <span class="pp">|</span> t-stat <span class="pp">|</span> p-value <span class="pp">|</span> CI Low   <span class="pp">|</span> CI High  <span class="pp">|</span></span>
+<span id="cb5-129"><a href="#cb5-129" aria-hidden="true" tabindex="-1"></a><span class="pp">|------------------------------|----------|-----------|--------|---------|----------|----------|</span></span>
+<span id="cb5-130"><a href="#cb5-130" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> pct_sf_renter_occupied       <span class="pp">|</span> -103.558 <span class="pp">|</span> 64.051    <span class="pp">|</span> -1.617 <span class="pp">|</span> 0.106   <span class="pp">|</span> -229.097 <span class="pp">|</span> 21.981   <span class="pp">|</span></span>
+<span id="cb5-131"><a href="#cb5-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> median_household_income      <span class="pp">|</span> 0.0018   <span class="pp">|</span> 0.0004    <span class="pp">|</span> 4.851  <span class="pp">|</span> 0.000   <span class="pp">|</span> 0.0011   <span class="pp">|</span> 0.0026   <span class="pp">|</span></span>
+<span id="cb5-132"><a href="#cb5-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> owner_renter_income_gap      <span class="pp">|</span> 0.0006   <span class="pp">|</span> 0.0002    <span class="pp">|</span> 3.925  <span class="pp">|</span> 0.000   <span class="pp">|</span> 0.0003   <span class="pp">|</span> 0.0009   <span class="pp">|</span></span>
+<span id="cb5-133"><a href="#cb5-133" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> pct_vacant                   <span class="pp">|</span> 31.207   <span class="pp">|</span> 72.176    <span class="pp">|</span> 0.432  <span class="pp">|</span> 0.666   <span class="pp">|</span> -110.258 <span class="pp">|</span> 172.673  <span class="pp">|</span></span>
+<span id="cb5-134"><a href="#cb5-134" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> pop_in_occupied_total        <span class="pp">|</span> 0.0088   <span class="pp">|</span> 0.0046    <span class="pp">|</span> 1.934  <span class="pp">|</span> 0.053   <span class="pp">|</span> -0.0001  <span class="pp">|</span> 0.0178   <span class="pp">|</span></span>
+<span id="cb5-135"><a href="#cb5-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-136"><a href="#cb5-136" aria-hidden="true" tabindex="-1"></a>**Observations:** 8,284  </span>
+<span id="cb5-137"><a href="#cb5-137" aria-hidden="true" tabindex="-1"></a>**Absorbed R²:** 0.9455</span>
+<span id="cb5-138"><a href="#cb5-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-139"><a href="#cb5-139" aria-hidden="true" tabindex="-1"></a>We see that a $10,000 increase in median household income within a tract is associated with an approximately $18 increase in monthly owner costs when holding tract, and county $\times$ year effects constant. Similarly, a $10,000 increase in the owner-renter income gap is associated with an approximately $6 increase in monthly owner costs. </span>
+<span id="cb5-140"><a href="#cb5-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-141"><a href="#cb5-141" aria-hidden="true" tabindex="-1"></a>The complexity of this model leads to a lot of things to consider. For example, while "Absorbed $R^2$" is impressively high, the county $\times$ year fixed effect will by nature increase the $R^2$ metric. So, we need to rely on coefficient stability and statistical significance rather than the $R^2$. We found after fitting two different models (the first being a one-way fixed effects model) that main variables were more stable in our current model. Additionally, although not individually statistically significant, the other variables remain part of the joint explanatory structure of the model and contribute to overall fit.</span>
+<span id="cb5-142"><a href="#cb5-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-143"><a href="#cb5-143" aria-hidden="true" tabindex="-1"></a>In particular, the coefficients on median household income and the owner-renter income gap remained consistent in both magnitude and statistical significance, suggesting that these relationships are not driven by broader county-level shocks. Overall, this stability across model specifications provides evidence that our results are not sensitive to unobserved, time-varying county-level factors, and supports the use of the more complex model as a framework for identifying within-tract drivers of housing costs.</span>
+<span id="cb5-144"><a href="#cb5-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-145"><a href="#cb5-145" aria-hidden="true" tabindex="-1"></a>These findings directly address our research goal by identifying which tract-level changes are most strongly associated with rising ownership costs over time.</span>
+<span id="cb5-146"><a href="#cb5-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-147"><a href="#cb5-147" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conclusions ##</span></span>
+<span id="cb5-148"><a href="#cb5-148" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb5-149"><a href="#cb5-149" aria-hidden="true" tabindex="-1"></a>We were successfully able to establish that variables strongly associated with the rise in house prices in Utah within tracts over time are median household income, the owner-renter income gap, and population growth, answering our original question of what factors are leading to a difficulty in purchasing homes in recent years. It should be noted that these estimates are really of association and not causation. </span>
+<span id="cb5-150"><a href="#cb5-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-151"><a href="#cb5-151" aria-hidden="true" tabindex="-1"></a>While there are still many questions we would like to explore, like "how do zoning laws affect house prices?" and "is it really less profitable to build less expensive homes?", we consider this analysis to provide useful insight into the drivers of housing costs. </span>
+<span id="cb5-152"><a href="#cb5-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-153"><a href="#cb5-153" aria-hidden="true" tabindex="-1"></a></span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

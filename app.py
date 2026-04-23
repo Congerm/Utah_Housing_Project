@@ -6,8 +6,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
-# from utah_housing import OUTCOME, PREDICTORS 
-from utah_housing_package.utah_housing import OUTCOME, PREDICTORS
+from utah_housing import OUTCOME, COMPLEX_PREDICTORS
 
 st.set_page_config(page_title="Utah Housing Affordability Explorer", layout="wide")
 
