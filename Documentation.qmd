@@ -72,14 +72,14 @@ pip install utah-housing
 
 ```{python}
 #| eval: false
-from utah_housing import fetch_year, fetch_all_years, OUTCOME, COMPLEX_PREDICTORS
+from utah_housing import fetch_year, fetch_all_years, OUTCOME, COMPLEX_PREDICTORS as PREDICTORS
 
 # Fetch ACS 5-year estimates for all years
 df = fetch_all_years(years=range(2009, 2024))
 
 # Inspect variable groupings
 print("Outcome:", OUTCOME)
-print("Predictors:", COMPLEX_PREDICTORS)
+print("Predictors:", PREDICTORS)
 ```
 
 | Function / Constant | Description |
@@ -87,8 +87,7 @@ print("Predictors:", COMPLEX_PREDICTORS)
 | `fetch_year(year)` | Fetches ACS 5-year estimates for all Utah census tracts for a single year |
 | `fetch_all_years(years)` | Fetches ACS estimates for all Utah census tracts across a range of years |
 | `OUTCOME` | String constant: `"median_owner_costs_with_mortgage"` |
-| `BASE_PREDICTORS` | List of the four base predictor variable names |
-| `COMPLEX_PREDICTORS` | List of all five predictor variable names used in the model | 
+| `PREDICTORS` | List of all five predictor variable names used in the model | 
 
 ---
 
