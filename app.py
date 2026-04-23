@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import plotly.express as px
-from utah_housing import OUTCOME, PREDICTORS
+from utah_housing import OUTCOME, COMPLEX_PREDICTORS
 
 st.set_page_config(page_title="Utah Housing Affordability Explorer", layout="wide")
 
@@ -53,7 +53,7 @@ selected_years = list(range(year_range[0], year_range[1] + 1))
 
 metric = st.sidebar.selectbox(
     "Outcome metric",
-    options=[OUTCOME] + PREDICTORS,
+    options=[OUTCOME] + COMPLEX_PREDICTORS,
     format_func=lambda x: x.replace("_", " ").title(),
 )
 
@@ -126,7 +126,7 @@ with tab1:
 with tab2:
     st.markdown(f"### {metric.replace('_', ' ').title()} by County")
 
-    all_metrics = [OUTCOME] + PREDICTORS
+    all_metrics = [OUTCOME] + COMPLEX_PREDICTORS
     county_avg = (
         filtered.groupby(["county", "county_name"])[all_metrics]
         .median()
@@ -219,7 +219,7 @@ with tab2:
 with tab3:
     st.markdown("### Descriptive Statistics")
 
-    analysis_cols = [OUTCOME] + PREDICTORS
+    analysis_cols = [OUTCOME] + COMPLEX_PREDICTORS
     available_cols = [c for c in analysis_cols if c in filtered.columns]
 
     st.write(filtered[available_cols].describe().round(3))
