@@ -15,8 +15,6 @@ website:
         text: Tutorial
       - href: TechnicalReport.qmd
         text: Technical Report
-      - href: getting_started.ipynb
-        text: Getting Started - .ipynb
 
 jupyter: utah-housing-project
 
